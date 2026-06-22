@@ -1,0 +1,17 @@
+/**
+ * Projects data configuration.
+ * Add new projects here — the InfiniteGrid layout engine automatically
+ * places them at unique world-space positions (spiral outward from center).
+ */
+export const projectsList = [
+  { id: 1, title: "Lumina AI",      desc: "A next-generation AI assistant built with LLMs and real-time streaming capabilities.",            tag: "Next.js",   link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=600&q=80" },
+  { id: 2, title: "Nexus Platform", desc: "Decentralized finance dashboard for tracking and managing multi-chain crypto assets.",            tag: "React",     link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80" },
+  { id: 3, title: "Orbit Engine",   desc: "A custom 3D rendering engine built on WebGL and Three.js with shading effects.",                  tag: "Three.js",  link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" },
+  { id: 4, title: "SwiftPay",       desc: "A cross-platform mobile wallet app supporting offline and peer-to-peer payments.",                 tag: "Flutter",   link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=600&q=80" },
+  { id: 5, type: "featured", title: "Featured Projects", desc: "Crafting modern, immersive applications that bridge the gap between design and high performance.", tag: "React", git: "https://github.com/niz-jayan/Portfolio-page" },
+  { id: 6, title: "Zenith CRM",     desc: "Enterprise cloud customer relationship management dashboard with real-time analytics.",             tag: "Turborepo", link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" },
+  { id: 7, title: "Aura Workspace", desc: "Collaborative canvas editor with multi-user presence, sharing, and drag-drop tools.",              tag: "React",     link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" },
+  { id: 8, title: "Pulse Sync",     desc: "Developer workflow automation tools connecting GitHub actions directly to cloud servers.",         tag: "DevOps",    link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80" },
+  { id: 9, title: "Nova Shell",     desc: "Custom command line interface tool for automating development environment setups.",                tag: "Node",      link: "https://github.com/niz-jayan/Portfolio-page", git: "https://github.com/niz-jayan/Portfolio-page", image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=600&q=80" },
+  
+];

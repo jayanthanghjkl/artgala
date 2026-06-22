@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --color-pure-black: #000000;
+  --color-vivid-crimson: #e60026;
+  --color-pure-white: #ffffff;
+  --color-cool-light-gray: #f4f4f5;
+  --color-cool-gray-border: #e4e4e7;
+  --color-dark-burgundy-start: #3b0712;
+  --color-dark-burgundy-end: #1a050d;
+  --color-glow-red: rgba(230, 0, 38, 0.22);
+  
+  --color-zinc-950: #09090b;
+  --color-zinc-900: #18181b;
+  --color-zinc-800: #27272a;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-500: #71717a;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-200: #e4e4e7;
+}
+
+/* Base custom styles using Tailwind values */
+@layer base {
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+    background-color: var(--color-pure-black);
+    color: var(--color-pure-white);
+    font-family: var(--font-body);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-pure-black);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 4px;
+    border: 2px solid var(--color-pure-black);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-vivid-crimson);
+  }
+
+  ::selection {
+    background-color: var(--color-vivid-crimson);
+    color: var(--color-pure-white);
+  }
+}
+
+@utility scrollbar-none {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility flip-card-container {
+  perspective: 1000px;
+}
+
+@utility flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+@utility flip-card-hover {
+  transform: rotateY(180deg);
+}
+
+@utility flip-card-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@utility flip-card-back {
+  transform: rotateY(180deg);
+}
