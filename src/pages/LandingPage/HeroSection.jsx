@@ -17,7 +17,7 @@ const LERP_CURSOR   = 0.9;          // Smoothing interpolation factor for mouse 
 
 // ── 3D MODEL ELEMENT ────────────────────────────────────────────────────────
 function HeroModel({ meshRef }) {
-  const gltf = useGLTF('/hero.glb');
+  const gltf = useGLTF('/hero-optimized.glb');
   
   return (
     <primitive
