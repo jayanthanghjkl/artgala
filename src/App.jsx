@@ -1,6 +1,6 @@
 import HeroSection from './pages/LandingPage/HeroSection';
 import AboutPage from './pages/AboutPage/AboutPage';
-import StaggeredGrid from './pages/SkillsPage/StaggeredGrid';
+import StaggeredGrid from './pages/SkillsPage/staggeredGrid'; // Make sure this matches 'staggeredGrid.jsx' exactly!
 import ProjectsPage from './pages/ProjectsPage/ProjectsPage';
 import Footer25 from './components/ui/Footer25';
 
