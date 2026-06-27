@@ -99,7 +99,7 @@ function getHandLines(wrist, u, v, scale, handType) {
   return lines;
 }
 
-export default function AsciiHands() {
+export default function AsciiHands({ opacity = 0.2 }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -113,6 +113,29 @@ export default function AsciiHands() {
   const currentMRef = useRef({ x: 0, y: 0 }); // Current connection point (grid units)
 
   useEffect(() => {
+    // 1. Mouse Tracking window-bound listeners so they register hover anywhere on page
+    const handleWindowPointerMove = (e) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      mousePosRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    const handleWindowPointerEnter = () => {
+      mouseActiveRef.current = true;
+    };
+
+    const handleWindowPointerLeave = () => {
+      mouseActiveRef.current = false;
+    };
+
+    window.addEventListener("pointermove", handleWindowPointerMove);
+    window.addEventListener("pointerenter", handleWindowPointerEnter);
+    window.addEventListener("pointerleave", handleWindowPointerLeave);
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -124,9 +147,10 @@ export default function AsciiHands() {
     let height = 0;
 
     // Font metrics setup
-    const fontSize = 11;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const fontSize = isMobile ? 18 : 11;
     ctx.font = `${fontSize}px Courier New, Courier, monospace`;
-    const charWidth = ctx.measureText('X').width || 7;
+    const charWidth = ctx.measureText('X').width || (isMobile ? 11 : 7);
     const charHeight = fontSize * 1.1;
 
     // Handle resizing
@@ -166,7 +190,7 @@ export default function AsciiHands() {
       const cols = Math.floor(width / charWidth);
       const rows = Math.floor(height / charHeight);
 
-      // 1. Mouse Lerping & Targets
+      // Mouse Lerping & Targets
       let targetM;
       if (mouseActiveRef.current) {
         targetM = {
@@ -182,12 +206,12 @@ export default function AsciiHands() {
       currentMRef.current.y += (targetM.y - currentMRef.current.y) * 0.07;
       const currentM = currentMRef.current;
 
-      // 2. Entrance Easing and Breathing
+      // Entrance Easing and Breathing
       const targetP = 0.95 + 0.015 * Math.sin(time * 0.04);
       pRef.current += (targetP - pRef.current) * 0.04;
       const p = pRef.current;
 
-      // 3. Define Bases & Reach Boundaries
+      // Define Bases & Reach Boundaries
       // Arm bases come from corners of the grid
       const BL = { x: -0.15 * cols, y: -0.05 * rows };
       const BR = { x: 1.15 * cols, y: 1.05 * rows };
@@ -217,7 +241,7 @@ export default function AsciiHands() {
         TR.y = BR.y + dyR * (maxReach / distR);
       }
 
-      // 4. Calculate Orientation Vectors & Wrist Positions
+      // Calculate Orientation Vectors & Wrist Positions
       const scale = Math.max(1.0, Math.min(2.4, (cols * 0.22) / 13));
       const handLength = 13 * scale;
 
@@ -233,7 +257,7 @@ export default function AsciiHands() {
       const vR = { x: -uR.y, y: uR.x };
       const WR = { x: TR.x - handLength * uR.x, y: TR.y - handLength * uR.y };
 
-      // 5. Gather All Line Segments
+      // Gather All Line Segments
       const lines = [];
       lines.push(...getHandLines(WL, uL, vL, scale, 'left'));
       lines.push(...getHandLines(WR, uR, vR, scale, 'right'));
@@ -257,7 +281,7 @@ export default function AsciiHands() {
         b: { x: WR.x - 1.0 * scale * vR.x, y: WR.y - 1.0 * scale * vR.y }
       });
 
-      // 6. Draw Canvas background & Setup Radial Gradient
+      // Clear with solid black (or transparent if layered, but black creates contrast)
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, width, height);
 
@@ -271,18 +295,18 @@ export default function AsciiHands() {
       gradient.addColorStop(0.12, '#ff6e8a');    // Neon light pinkish-red
       gradient.addColorStop(0.35, '#e60026');    // Vivid crimson portfolio theme
       gradient.addColorStop(0.65, '#5c0010');    // Dark burgundy shadow
-      gradient.addColorStop(1.0, '#100003');     // Faded out dark edge
+      gradient.addColorStop(1.0, '#000000');     // Faded out dark edge
 
       ctx.fillStyle = gradient;
       ctx.font = `${fontSize}px Courier New, Courier, monospace`;
       ctx.textBaseline = 'top';
       ctx.textAlign = 'left';
 
-      // 7. Calculate connection spark state
+      // Calculate connection spark state
       const tipDist = Math.sqrt((TL.x - TR.x) ** 2 + (TL.y - TR.y) ** 2);
       const isConnecting = tipDist < 2.5 && p > 0.85;
 
-      // 8. Render Character Grid (Skip spaces for extreme 60 FPS performance)
+      // Render Character Grid
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           let char = ' ';
@@ -311,7 +335,7 @@ export default function AsciiHands() {
               }
             }
             const d = Math.sqrt(minDistSq);
-            const thickness = 2.8; // SDF contour width
+            const thickness = 2.8;
 
             if (d < thickness) {
               const t = 1 - d / thickness;
@@ -322,7 +346,7 @@ export default function AsciiHands() {
           }
 
           // C. Faint mouse ripples
-          if (char === ' ' && mouseActiveRef.current) {
+          if (char === ' ' && mouseActiveRef.current && !isMobile) {
             const mouseGrid = {
               x: mousePosRef.current.x / charWidth,
               y: mousePosRef.current.y / charHeight
@@ -334,7 +358,7 @@ export default function AsciiHands() {
             if (distToMouse < 26) {
               const ripplePhase = distToMouse * 0.45 - time * 0.12;
               const wave = Math.sin(ripplePhase);
-              const amplitude = (1 - distToMouse / 26) * 0.18; // Ripple opacity decay
+              const amplitude = (1 - distToMouse / 26) * 0.18;
 
               if (Math.abs(wave) < 0.15 && Math.random() < amplitude) {
                 char = '.';
@@ -357,35 +381,17 @@ export default function AsciiHands() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+      window.removeEventListener("pointerenter", handleWindowPointerEnter);
+      window.removeEventListener("pointerleave", handleWindowPointerLeave);
     };
   }, []);
-
-  // Mouse & Touch Handlers
-  const handlePointerMove = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    mousePosRef.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  };
-
-  const handlePointerEnter = () => {
-    mouseActiveRef.current = true;
-  };
-
-  const handlePointerLeave = () => {
-    mouseActiveRef.current = false;
-  };
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative cursor-crosshair select-none bg-pure-black overflow-hidden"
-      onPointerMove={handlePointerMove}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
+      style={{ opacity }}
+      className="absolute inset-0 w-full h-full pointer-events-none select-none bg-black overflow-hidden z-0"
     >
       <canvas
         ref={canvasRef}

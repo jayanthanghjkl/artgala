@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import gsap from 'gsap';
 import { projectsList } from '../../data/projects';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -81,7 +82,7 @@ function computeLayout(projects, cellW, cellH) {
 // COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function InfiniteGrid() {
+export default function InfiniteGrid({ inView }) {
   const containerRef = useRef(null);
   const [viewport, setViewport] = useState({ width: 1200, height: 800 });
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -103,6 +104,40 @@ export default function InfiniteGrid() {
   useEffect(() => { panRef.current = pan; }, [pan]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   useEffect(() => { isDraggingRef.current = isDragging; }, [isDragging]);
+
+  // ── Entrance Zoom & Pan swoop animation ────────────────────────────────────
+  useEffect(() => {
+    if (inView) {
+      const animObj = { zoom: 2.2, panX: 0, panY: -250 };
+      
+      gsap.killTweensOf(animObj);
+      
+      gsap.to(animObj, {
+        zoom: 1.33,
+        panX: 0,
+        panY: 0,
+        duration: 1.6,
+        ease: 'power3.out',
+        onUpdate: () => {
+          setZoom(animObj.zoom);
+          setPan({ x: animObj.panX, y: animObj.panY });
+        }
+      });
+      
+      // Stagger card items scale and opacity
+      const cardElems = containerRef.current?.querySelectorAll('.grid-card-item');
+      if (cardElems && cardElems.length > 0) {
+        gsap.fromTo(cardElems,
+          { opacity: 0, scale: 0.7 },
+          { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out', stagger: { each: 0.04, from: 'center' }, delay: 0.1 }
+        );
+      }
+    } else {
+      // Instantly reset coordinates and zoom when out of view
+      setZoom(2.2);
+      setPan({ x: 0, y: -250 });
+    }
+  }, [inView]);
 
   // ── Responsive card dimensions ────────────────────────────────────────────
   const isMobile = viewport.width < 768;
@@ -311,7 +346,7 @@ export default function InfiniteGrid() {
                 width:  CARD_W,
                 height: CARD_H,
               }}
-              className="pointer-events-auto"
+              className="pointer-events-auto grid-card-item"
             >
               {/* ── HEADER / FEATURED CARD ─────────────────────────────── */}
               {project.type === 'featured' ? (
@@ -336,7 +371,7 @@ export default function InfiniteGrid() {
                       setActiveCardId((prev) => (prev === project.id ? null : project.id));
                     }
                   }}
-                  className="w-full h-full group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-lg select-none"
+                  className="w-full h-full group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/70 backdrop-blur-md shadow-lg transition-all duration-500 ease-out hover:scale-[1.03] hover:border-vivid-crimson/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_25px_rgba(230,0,38,0.18)] select-none"
                 >
                   {/* Front face */}
                   <div
@@ -377,13 +412,13 @@ export default function InfiniteGrid() {
                       transform: `translateY(${isActive ? 0 : 12}px)`,
                       pointerEvents: isActive ? 'auto' : 'none',
                     }}
-                    className="absolute inset-0 bg-zinc-950 text-pure-white p-4 md:p-5 flex flex-col justify-between transition-all duration-300"
+                    className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md text-pure-white p-4 md:p-5 flex flex-col justify-between transition-all duration-300"
                   >
                     <div className="flex flex-col gap-1">
                       <span className="font-heading text-[7px] md:text-[9px] font-bold text-vivid-crimson tracking-widest uppercase mb-1">
                         Project Details
                       </span>
-                      <p className="font-body text-[10px] md:text-[11px] text-zinc-300 leading-relaxed">
+                      <p className="font-body text-[10px] md:text-[11px] text-zinc-300 leading-relaxed font-light">
                         {project.desc}
                       </p>
                     </div>
@@ -392,7 +427,7 @@ export default function InfiniteGrid() {
                         {(project.tags || (project.tag ? [project.tag] : [])).map((tag) => (
                           <span
                             key={tag}
-                            className="text-[7px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700/60 text-zinc-400"
+                            className="text-[7px] font-mono px-1.5 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-zinc-400"
                           >
                             {tag}
                           </span>

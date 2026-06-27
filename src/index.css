@@ -3,16 +3,16 @@
 @theme {
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  
+
   --color-pure-black: #000000;
   --color-vivid-crimson: #e60026;
-  --color-pure-white: #ffffff;
+  --color-pure-white: #F4F1EA;
   --color-cool-light-gray: #f4f4f5;
   --color-cool-gray-border: #e4e4e7;
   --color-dark-burgundy-start: #3b0712;
   --color-dark-burgundy-end: #1a050d;
   --color-glow-red: rgba(230, 0, 38, 0.22);
-  
+
   --color-zinc-950: #09090b;
   --color-zinc-900: #18181b;
   --color-zinc-800: #27272a;
@@ -26,13 +26,18 @@
 /* Base custom styles using Tailwind values */
 @layer base {
   html {
-    scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
   }
-  
+
+  @media (min-width: 768px) {
+    html {
+      scroll-snap-type: y mandatory;
+    }
+  }
+
   body,
   #root {
     width: 100%;
@@ -71,6 +76,7 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
