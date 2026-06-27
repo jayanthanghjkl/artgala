@@ -264,4 +264,4 @@ export default function HeroSection({ isEntered }) {
   );
 }
 
-useGLTF.preload('/hero.glb');
+useGLTF.preload('/hero-optimized.glb');
