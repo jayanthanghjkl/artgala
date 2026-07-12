@@ -10,15 +10,15 @@ const SCROLL_CAM_MOVE_X = 0.008;    // Scroll camera flight scale on X
 const SCROLL_CAM_MOVE_Y = -0.005;   // Scroll camera flight scale on Y
 const SCROLL_CAM_ZOOM_Z = -0.015;   // Scroll camera zoom depth scale on Z
 
-const CURSOR_Y      = 1;            // Mouse looking range on Y axis
-const CURSOR_X      = 1;            // Mouse looking range on X axis
-const LERP_SCROLL   = 0.9;          // Smoothing interpolation factor for scrolls
-const LERP_CURSOR   = 0.9;          // Smoothing interpolation factor for mouse parallax
+const CURSOR_Y = 1;            // Mouse looking range on Y axis
+const CURSOR_X = 1;            // Mouse looking range on X axis
+const LERP_SCROLL = 0.9;          // Smoothing interpolation factor for scrolls
+const LERP_CURSOR = 0.9;          // Smoothing interpolation factor for mouse parallax
 
 // ── 3D MODEL ELEMENT ────────────────────────────────────────────────────────
 function HeroModel({ meshRef }) {
   const gltf = useGLTF('/hero-optimized.glb');
-  
+
   return (
     <primitive
       ref={meshRef}
@@ -50,7 +50,7 @@ function CameraController({ spiralRef, cursorRef, isEntered }) {
     s.sZ = THREE.MathUtils.lerp(s.sZ, a * SCROLL_CAM_ZOOM_Z, LERP_SCROLL);
 
     // 2. Calculate smooth cursor offsets for subtle parallax looking around
-    s.cY = THREE.MathUtils.lerp(s.cY,  cursorRef.current.nx * CURSOR_Y, LERP_CURSOR);
+    s.cY = THREE.MathUtils.lerp(s.cY, cursorRef.current.nx * CURSOR_Y, LERP_CURSOR);
     s.cX = THREE.MathUtils.lerp(s.cX, -cursorRef.current.ny * CURSOR_X, LERP_CURSOR);
 
     // 3. Move the camera relative to the animated base coordinates
@@ -69,13 +69,13 @@ function CameraController({ spiralRef, cursorRef, isEntered }) {
 export default function HeroSection({ isEntered }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isHeroActive, setIsHeroActive] = useState(false);
-  
+
   // Interactive 3D Model refs
   const sectionRef = useRef(null);
-  const meshRef    = useRef();
-  const spiralRef  = useRef(0);
-  const lastY      = useRef(0);
-  const cursorRef  = useRef({ nx: 0, ny: 0 });
+  const meshRef = useRef();
+  const spiralRef = useRef(0);
+  const lastY = useRef(0);
+  const cursorRef = useRef({ nx: 0, ny: 0 });
 
   // Scroll and Parallax interaction tracking
   useEffect(() => {
@@ -92,22 +92,22 @@ export default function HeroSection({ isEntered }) {
     };
 
     const onMouse = (e) => {
-      cursorRef.current.nx = (e.clientX / window.innerWidth  - 0.5) * 2;
+      cursorRef.current.nx = (e.clientX / window.innerWidth - 0.5) * 2;
       cursorRef.current.ny = (e.clientY / window.innerHeight - 0.5) * 2;
     };
 
     const onTouch = (e) => {
       const t = e.touches[0];
-      cursorRef.current.nx = (t.clientX / window.innerWidth  - 0.5) * 2;
+      cursorRef.current.nx = (t.clientX / window.innerWidth - 0.5) * 2;
       cursorRef.current.ny = (t.clientY / window.innerHeight - 0.5) * 2;
     };
 
-    document.addEventListener('scroll',   onScroll, { capture: true, passive: true });
-    window.addEventListener('mousemove',  onMouse,  { passive: true });
-    window.addEventListener('touchmove',  onTouch,  { passive: true });
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    window.addEventListener('mousemove', onMouse, { passive: true });
+    window.addEventListener('touchmove', onTouch, { passive: true });
 
     return () => {
-      document.removeEventListener('scroll',   onScroll, { capture: true });
+      document.removeEventListener('scroll', onScroll, { capture: true });
       window.removeEventListener('mousemove', onMouse);
       window.removeEventListener('touchmove', onTouch);
     };
@@ -139,19 +139,18 @@ export default function HeroSection({ isEntered }) {
   }, []);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      id="hero" 
-      className={`relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-black transition-all duration-300 ${
-        isHeroActive ? 'hero-view-active' : ''
-      }`}
+      id="hero"
+      className={`relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-black transition-all duration-300 ${isHeroActive ? 'hero-view-active' : ''
+        }`}
     >
-      
+
       {/* 1. THREE.JS 3D CANVAS BACKGROUND LAYER */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Red theme glow backdrop */}
         <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,rgba(230,0,38,0.22)_0%,transparent_60%)]" />
-        
+
         {/* WebGL Canvas */}
         <div className="absolute inset-0 z-[2]">
           <Canvas
@@ -161,11 +160,11 @@ export default function HeroSection({ isEntered }) {
           >
             <ambientLight intensity={1} />
             <directionalLight position={[0, 10, 15]} intensity={2} />
-            
+
             {/* Red rim kicker lights */}
             <pointLight position={[-10, 5, -10]} intensity={100} distance={100} decay={2} color="#e60026" />
             <pointLight position={[10, 5, -10]} intensity={100} distance={100} decay={2} color="#e60026" />
-            
+
             <Suspense fallback={null}>
               <HeroModel meshRef={meshRef} />
             </Suspense>
@@ -178,7 +177,8 @@ export default function HeroSection({ isEntered }) {
       {/* Navbar rendered inside the Hero Section */}
       <Navbar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} isEntered={isEntered} />
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes heroTitleReveal {
           from { transform: translateY(105%) scaleY(1.1); opacity: 0; }
           to   { transform: translateY(0) scaleY(1); opacity: 1; }
@@ -221,8 +221,8 @@ export default function HeroSection({ isEntered }) {
               scalable code
             </p>
           </div>
-          
-          <h1 
+
+          <h1
             className="font-heading font-black pt-3 leading-[0.82] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden flex flex-nowrap items-baseline whitespace-nowrap"
             style={{ fontSize: 'clamp(56px, 7.5vw, 115px)' }}
           >
@@ -242,8 +242,8 @@ export default function HeroSection({ isEntered }) {
               scalable code
             </p>
           </div>
-          
-          <h1 
+
+          <h1
             className="font-heading font-black leading-[0.9] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden flex flex-col items-start"
             style={{ fontSize: 'clamp(32px, 10vw, 48px)' }}
           >

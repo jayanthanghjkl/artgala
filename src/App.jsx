@@ -1,38 +1,46 @@
+import React, { useEffect, useRef } from 'react';
 import HeroSection from './pages/LandingPage/HeroSection';
 import AboutPage from './pages/AboutPage/AboutPage';
-import StaggeredGrid from './pages/SkillsPage/staggeredGrid'; // Make sure this matches 'staggeredGrid.jsx' exactly!
+import StaggeredGrid from './pages/SkillsPage/staggeredGrid'; 
 import ProjectsPage from './pages/ProjectsPage/ProjectsPage';
 import Footer25 from './components/ui/Footer25';
-
 import { skillsBentoItems, skillsGridImages } from './data/skills';
+
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Main application component.
- * Coordinates layouts, global navigation menus, cinematic backgrounds,
- * and snapped scrolling directly from initial mount.
+ * Coordinates smooth scrolling (Lenis), global navigation menus, cinematic backgrounds,
+ * and GSAP ScrollTrigger animations.
  */
 export default function App() {
+
   return (
-    <div className="scroll-container relative w-full min-h-screen md:h-screen md:overflow-y-auto md:snap-y md:snap-mandatory scroll-smooth bg-pure-black text-pure-white font-body selection:bg-vivid-crimson selection:text-pure-white">
+    <div className="relative w-full min-h-screen bg-pure-black text-pure-white font-body selection:bg-vivid-crimson selection:text-pure-white">
+      <main className="relative z-10 w-full">
 
-      {/* 2. SCROLLABLE CONTENT LAYERS */}
-      <main className="relative z-10 w-full h-full">
-
-        {/* Hero Section Container */}
-        <div className="w-full h-[140vh] snap-start snap-always relative">
+        {/* Hero -> About Transition Wrapper */}
+        {/* We make the wrapper 200vh so it takes 1 full screen height to scrub the transition */}
+        <div className="hero-about-transition relative w-full h-[200vh]">
+          
+          {/* Hero Section stays fixed underneath during the 200vh scroll */}
           <div className="sticky top-0 w-full h-screen">
-            {/* Passed true directly to trigger internal hero text cascades instantly */}
             <HeroSection isEntered={true} />
+          </div>
+          
+          {/* About Section acts as the sliding overlay with clip-path animated by GSAP */}
+          {/* When the user scrolls past 100vh of scrub, it naturally flows up */}
+          <div className="top-0 left-0 w-full h-screen">
+            <AboutPage />
           </div>
         </div>
 
-        {/* About Section Container */}
-        <div className="w-full h-screen snap-start snap-always">
-          <AboutPage />
-        </div>
-
-        {/* Skills Section Container (Staggered Bento Grid) */}
-        <div id="skills" className="w-full h-screen snap-start snap-always">
+        {/* Skills Section Container */}
+        <div id="skills" className="w-full relative z-20 bg-[#101010]">
           <StaggeredGrid 
             images={skillsGridImages} 
             bentoItems={skillsBentoItems} 
@@ -41,12 +49,12 @@ export default function App() {
         </div>
 
         {/* Projects Section Container */}
-        <div className="w-full h-screen snap-start snap-always">
+        <div className="w-full h-screen relative z-20">
           <ProjectsPage />
         </div>
 
         {/* Contact Section & Footer (Footer25) */}
-        <div id="contact" className="w-full h-screen snap-start snap-always">
+        <div id="contact" className="w-full h-screen relative z-20">
           <Footer25 />
         </div>
 
