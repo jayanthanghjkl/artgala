@@ -12,50 +12,11 @@ gsap.registerPlugin(ScrollTrigger);
 export default function AboutPage() {
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Create a timeline that triggers when the about section enters the viewport
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 60%', // Trigger animation when top hits 60% of viewport
-          toggleActions: 'play none none reverse', // Replays backwards when scrolling up
-        }
-      });
-
-      // 1. Horizontal line expands
-      tl.fromTo('.about-rule',
-        { scaleX: 0 },
-        { scaleX: 1, duration: 1.2, ease: 'power3.out', transformOrigin: 'left' }
-      )
-        // 2. Heading rises up
-        .fromTo('.about-h2-anim',
-          { opacity: 0, y: 48, filter: 'blur(8px)' },
-          { opacity: 1, y: 0, filter: 'blur(0)', duration: 1.4, ease: 'power3.out' },
-          '-=1.0'
-        )
-        // 3. Portrait image scales and fades in
-        .fromTo('.about-portrait',
-          { opacity: 0, y: 40, scale: 0.96, filter: 'blur(4px)' },
-          { opacity: 1, y: 0, scale: 1, filter: 'blur(0)', duration: 1.5, ease: 'power3.out' },
-          '-=1.2'
-        )
-        // 4. Text column fades up smoothly
-        .fromTo('.about-text-column',
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' },
-          '-=1.2'
-        );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
       ref={containerRef}
       id="about"
-      className="relative w-full h-screen bg-[#f4f1ea] text-zinc-900 px-6 md:px-16 py-12 flex flex-col justify-between overflow-hidden select-none"
+      className="relative w-full h-full text-zinc-900 px-6 md:px-16 py-12 flex flex-col justify-between overflow-hidden select-none pointer-events-none"
     >
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -82,7 +43,7 @@ export default function AboutPage() {
         {/* COLUMN LEFT (Span 4): Premium Animated Portrait Frame */}
         <div className="md:col-span-4 flex justify-center items-center w-full">
           <div
-            className="about-portrait about-portrait-wrap relative rounded-2xl overflow-hidden w-full max-w-[375px] border border-zinc-200 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)]"
+            className="about-portrait about-portrait-wrap relative rounded-2xl overflow-hidden w-full max-w-[375px] border border-zinc-200 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] opacity-0"
             style={{ aspectRatio: '3 / 4' }}
           >
             <img
@@ -98,7 +59,7 @@ export default function AboutPage() {
         </div>
 
         {/* COLUMN RIGHT (Span 8): Interlocking Typography Block */}
-        <div className="about-text-column md:col-span-8 flex flex-col gap-6">
+        <div className="about-text-column md:col-span-8 flex flex-col gap-6 opacity-0">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <div className="h-px w-8 bg-vivid-crimson" />
@@ -108,7 +69,7 @@ export default function AboutPage() {
             </div>
 
             {/* Paragraph 1 */}
-            <p className="font-body text-lg md:text-xl leading-relaxed tracking-wide max-w-2xl text-zinc-800 font-normal">
+            <p className="about-para-1 font-body text-lg md:text-xl leading-relaxed tracking-wide max-w-2xl text-zinc-800 font-normal opacity-40 transition-opacity">
               I am a software engineer focused on building high-performance digital experiences.
               My work lives at the intersection of complex architectural design systems and clean,
               highly scalable, fluid code implementation.
@@ -116,7 +77,7 @@ export default function AboutPage() {
           </div>
 
           {/* Paragraph 2 */}
-          <p className="font-body text-base md:text-lg leading-relaxed max-w-xl text-zinc-800 font-normal">
+          <p className="about-para-2 font-body text-base md:text-lg leading-relaxed max-w-xl text-zinc-800 font-normal opacity-40 transition-opacity">
             Driven by design psychology and creative technology, I engineer interactive products
             that don&rsquo;t just function perfectly under the hood, but feel premium and natural to the end user.
           </p>

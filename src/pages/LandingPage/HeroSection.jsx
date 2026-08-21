@@ -211,32 +211,23 @@ export default function HeroSection({ isEntered }) {
         }
       `}} />
 
-      {/* DESKTOP HERO VIEW CONTENT */}
-      <div className="hidden md:flex flex-1 relative z-10 w-full items-end px-12 pb-24 pt-32 opacity-100 translate-y-0 transition-all duration-1000">
-        <div className="relative max-w-[1400px] w-full mx-auto flex flex-col items-start">
-          <div className="max-w-[480px] mb-8 overflow-hidden">
-            <p className="hero-desc-anim font-body text-base ml-5 md:text-lg text-pure-white/95 leading-relaxed tracking-tight">
-              Building digital experiences <br />
-              that blend intuitive design with clean <br />
-              scalable code
-            </p>
-          </div>
-
-          <h1
-            className="font-heading font-black pt-3 leading-[0.82] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden flex flex-nowrap items-baseline whitespace-nowrap"
-            style={{ fontSize: 'clamp(56px, 7.5vw, 115px)' }}
-          >
-            <span className="hero-title-anim-1">JAYANTHAN</span>
-            <span className="hero-title-anim-2 ml-4 lg:ml-10">SATHIYAPAL</span>
-          </h1>
-        </div>
+      {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div 
+          className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[300px]"
+          style={{ transform: 'scale(0)' }} 
+        />
       </div>
 
-      {/* MOBILE HERO VIEW CONTENT */}
-      <div className="md:hidden flex flex-1 relative z-10 w-full items-end px-6 pb-16 pt-24 opacity-100 translate-y-0 transition-all duration-1000">
-        <div className="relative w-full flex flex-col items-start">
-          <div className="max-w-[280px] mb-6 overflow-hidden">
-            <p className="hero-desc-anim font-body text-sm text-pure-white/95 leading-relaxed tracking-tight">
+      {/* Blur overlay for transition */}
+      <div className="hero-blur-overlay absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 pointer-events-none z-30" />
+
+      {/* HERO VIEW CONTENT (Unified for Mobile and Desktop) */}
+      <div className="flex-1 relative z-30 w-full flex items-end px-3 pb-6 md:pb-13 pt-24 opacity-100 translate-y-0 transition-all duration-1000">
+        
+        <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start">
+          <div className="hero-desc-wrapper mb-6 md:mb-8 px-25 overflow-hidden">
+            <p className="hero-desc-anim font-body text-sm md:text-lg text-pure-white/95 leading-relaxed tracking-tight max-w-[280px] md:max-w-[480px]">
               Building digital experiences <br />
               that blend intuitive design with clean <br />
               scalable code
@@ -244,11 +235,15 @@ export default function HeroSection({ isEntered }) {
           </div>
 
           <h1
-            className="font-heading font-black leading-[0.9] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden flex flex-col items-start"
-            style={{ fontSize: 'clamp(32px, 10vw, 48px)' }}
+            className="font-heading font-black leading-[0.85] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden whitespace-nowrap flex items-center justify-center"
+            style={{ fontSize: 'clamp(24px, 7.5vw, 180px)' }}
           >
-            <span className="hero-title-anim-1">JAYANTHAN</span>
-            <span className="hero-title-anim-2 mt-1">SATHIYAPAL</span>
+            <span className="hero-name-left flex-1 flex justify-end pr-3 md:pr-5">
+              <span className="hero-title-anim-1">JAYANTHAN</span>
+            </span>
+            <span className="hero-name-right flex-1 flex justify-start pl-3 md:pl-5">
+              <span className="hero-title-anim-2">SATHIYAPAL</span>
+            </span>
           </h1>
         </div>
 
