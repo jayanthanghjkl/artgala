@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import HeroTransitionWrapper from './components/layout/HeroTransitionWrapper';
+import GalleryPage from './pages/GalleryPage/GalleryPage';
 import StaggeredGrid from './pages/SkillsPage/staggeredGrid'; 
 import ProjectsPage from './pages/ProjectsPage/ProjectsPage';
 import Footer25 from './components/ui/Footer25';
@@ -22,6 +23,9 @@ export default function App() {
     <Layout>
       {/* Master Wrapper for Hero and About transitions */}
       <HeroTransitionWrapper />
+
+      {/* Scroll-linked Gallery Section */}
+      <GalleryPage />
 
       {/* Skills Section Container */}
       <div id="skills" className="w-full relative z-20 bg-[#101010]">

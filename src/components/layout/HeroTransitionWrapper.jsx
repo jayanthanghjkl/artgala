@@ -16,7 +16,7 @@ export default function HeroTransitionWrapper() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '+=500%', // 5 screen heights of scroll
+          end: '+=600%', // 6 screen heights of scroll
           scrub: 1, // Smooth scrubbing
           pin: true,
           anticipatePin: 1,
@@ -30,8 +30,10 @@ export default function HeroTransitionWrapper() {
         .add('centerText')
         .to('.hero-text-container', { y: '-39vh', duration: 1, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-blur-overlay', { opacity: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
-        // Fade out the description wrapper right as the text reaches the center
+        .to('.hero-blackout-gradient', { scale: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
+        // Fade out the description wrapper and navbar right as the text reaches the center
         .to('.hero-desc-wrapper', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText+=0.7')
+        .to('.hero-navbar', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText+=0.7')
         // --- PHASE 2: Split Text & Expand Frame Simultaneously ---
         .add('splitAndExpand', '+=0.5')
         .to('.hero-name-left', { x: '-150vw', duration: 1.5, ease: 'power3.inOut' }, 'splitAndExpand')
@@ -42,7 +44,7 @@ export default function HeroTransitionWrapper() {
           duration: 1.5, 
           ease: 'power3.inOut' 
         }, 'splitAndExpand')
-        .to('.hero-blur-overlay', { opacity: 0, duration: 0.5 }, 'splitAndExpand')
+        .to('.hero-blur-overlay', { opacity: 0, duration: 0.5 }, 'splitAndExpand+=1.0')
 
         // --- PHASE 3: About Page Reveal ---
         .add('aboutReveal', '+=0.2')
@@ -53,10 +55,34 @@ export default function HeroTransitionWrapper() {
 
         // --- PHASE 4: Paragraph Highlights ---
         .add('para1', '+=0.2')
-        .to('.about-para-1', { opacity: 1, duration: 0.5 }, 'para1')
+        .to('.about-para-1', { 
+          opacity: 1, 
+          scale: 1.05, 
+          color: '#000000',
+          transformOrigin: 'left center',
+          duration: 0.8 
+        }, 'para1')
         
-        .add('para2', '+=0.5')
-        .to('.about-para-2', { opacity: 1, duration: 0.5 }, 'para2');
+        .add('para2', '+=1.0')
+        .to('.about-para-1', { 
+          opacity: 0.4, 
+          scale: 1, 
+          color: '#27272a', // zinc-800
+          duration: 0.8 
+        }, 'para2')
+        .to('.about-para-2', { 
+          opacity: 1, 
+          scale: 1.05, 
+          color: '#000000',
+          transformOrigin: 'left center',
+          duration: 0.8 
+        }, 'para2')
+        
+        // --- TIMELINE PADDING ---
+        // By adding 1.5 units of "empty" duration here, we guarantee that the final 100vh 
+        // of the 600vh pin is completely empty. This ensures the GalleryPage's scale/rotate 
+        // transition only activates AFTER the paragraph animations are 100% finished.
+        .to(containerRef.current, { duration: 1.5 });
 
     }, containerRef);
 

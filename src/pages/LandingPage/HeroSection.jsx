@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import Navbar from '../../components/navigation/Navbar';
+import LiquidEther from '../../components/effects/LiquidEther';
 
 // ── THREE.JS CAMERA AND PARALLAX CONFIGURATION ─────────────────────────────
 const CAMERA_BASE_POS = [0, 0.4, 14]; // Starting camera position [X, Y, Z]
@@ -148,6 +149,17 @@ export default function HeroSection({ isEntered }) {
 
       {/* 1. THREE.JS 3D CANVAS BACKGROUND LAYER */}
       <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Liquid Ether Background */}
+        <div className="absolute inset-0 z-[0]">
+          <LiquidEther
+            colors={['#e60026', '#ff0033', '#33000b']}
+            mouseForce={20}
+            cursorSize={100}
+            isViscous={false}
+            autoDemo={true}
+          />
+        </div>
+
         {/* Red theme glow backdrop */}
         <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,rgba(230,0,38,0.22)_0%,transparent_60%)]" />
 
@@ -211,32 +223,34 @@ export default function HeroSection({ isEntered }) {
         }
       `}} />
 
+      {/* Blur overlay for transition (Placed below expanding frame) */}
+      <div className="hero-blur-overlay absolute inset-0 backdrop-blur-md opacity-0 pointer-events-none z-10 flex items-center justify-center overflow-hidden">
+        <div className="hero-blackout-gradient absolute w-[200vw] h-[200vw] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%)', transform: 'scale(0)' }} />
+      </div>
+
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-        <div 
+      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+        <div
           className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[300px]"
-          style={{ transform: 'scale(0)' }} 
+          style={{ transform: 'scale(0)' }}
         />
       </div>
 
-      {/* Blur overlay for transition */}
-      <div className="hero-blur-overlay absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 pointer-events-none z-30" />
-
       {/* HERO VIEW CONTENT (Unified for Mobile and Desktop) */}
-      <div className="flex-1 relative z-30 w-full flex items-end px-3 pb-6 md:pb-13 pt-24 opacity-100 translate-y-0 transition-all duration-1000">
-        
-        <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start">
-          <div className="hero-desc-wrapper mb-6 md:mb-8 px-25 overflow-hidden">
-            <p className="hero-desc-anim font-body text-sm md:text-lg text-pure-white/95 leading-relaxed tracking-tight max-w-[280px] md:max-w-[480px]">
-              Building digital experiences <br />
-              that blend intuitive design with clean <br />
-              scalable code
-            </p>
-          </div>
+      <div className="flex-1 relative z-30 w-full flex items-end px-3 pb-6 md:pb-13 pt-24 translate-y-0 transition-all duration-1000">
 
+        <div className="absolute top-15 left-4 md:left-16 hero-desc-wrapper overflow-hidden z-20">
+          <p className="hero-desc-anim font-body text-md md:text-xl text-pure-white/60 leading-relaxed tracking-tight max-w-[280px] md:max-w-[480px]">
+            Building digital experiences <br />
+            that blend intuitive design with clean <br />
+            scalable code
+          </p>
+        </div>
+
+        <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start">
           <h1
             className="font-heading font-black leading-[0.85] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden whitespace-nowrap flex items-center justify-center"
-            style={{ fontSize: 'clamp(24px, 7.5vw, 180px)' }}
+            style={{ fontSize: 'clamp(2rem, 8vw, 11rem)' }}
           >
             <span className="hero-name-left flex-1 flex justify-end pr-3 md:pr-5">
               <span className="hero-title-anim-1">JAYANTHAN</span>
