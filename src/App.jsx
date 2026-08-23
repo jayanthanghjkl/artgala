@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import HeroTransitionWrapper from './components/layout/HeroTransitionWrapper';
-import GalleryPage from './pages/GalleryPage/GalleryPage';
-import StaggeredGrid from './pages/SkillsPage/staggeredGrid'; 
-import ProjectsPage from './pages/ProjectsPage/ProjectsPage';
-import Footer25 from './components/ui/Footer25';
-import { skillsBentoItems, skillsGridImages } from './data/skills';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Layout from './components/layout/Layout';
+import Home from './pages/Home';
+import ProjectsRoute from './pages/ProjectsRoute';
+import ProjectDetailPage from './pages/ProjectDetailPage/ProjectDetailPage';
+import ScrollToTop from './components/common/ScrollToTop';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -18,33 +18,35 @@ gsap.registerPlugin(ScrollTrigger);
  * and GSAP ScrollTrigger animations.
  */
 export default function App() {
+  const location = useLocation();
+  const [projectId, setProjectId] = useState(null);
+
+  useEffect(() => {
+    if (location.hash.startsWith('#project-')) {
+      const id = location.hash.replace('#project-', '');
+      setProjectId(id);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    } else {
+      setProjectId(null);
+      document.body.style.overflow = '';
+    }
+    
+    return () => { document.body.style.overflow = ''; }
+  }, [location.hash]);
 
   return (
     <Layout>
-      {/* Master Wrapper for Hero and About transitions */}
-      <HeroTransitionWrapper />
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/projects" element={<ProjectsRoute />} />
+      </Routes>
 
-      {/* Scroll-linked Gallery Section */}
-      <GalleryPage />
-
-      {/* Skills Section Container */}
-      <div id="skills" className="w-full relative z-20 bg-[#101010]">
-        <StaggeredGrid 
-          images={skillsGridImages} 
-          bentoItems={skillsBentoItems} 
-          centerText="Skills"
-        />
-      </div>
-
-      {/* Projects Section Container */}
-      <div className="w-full h-screen relative z-20">
-        <ProjectsPage />
-      </div>
-
-      {/* Contact Section & Footer (Footer25) */}
-      <div id="contact" className="w-full h-screen relative z-20">
-        <Footer25 />
-      </div>
+      <AnimatePresence>
+        {projectId && (
+          <ProjectDetailPage key="project-overlay" projectId={projectId} />
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }

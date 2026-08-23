@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import HeroSection from '../../pages/LandingPage/HeroSection';
@@ -11,7 +11,7 @@ export default function HeroTransitionWrapper() {
   const containerRef = useRef(null);
   const [triggerDecrypt, setTriggerDecrypt] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let ctx = gsap.context(() => {
       // Create the master timeline for the Hero -> About transition
       const tl = gsap.timeline({

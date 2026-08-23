@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import { cn } from '../../lib/utils'
@@ -119,7 +119,7 @@ export function StaggeredGrid({
     }
 
     // Viewport entrance animation timeline configuration via GSAP ScrollTrigger
-    useEffect(() => {
+    useLayoutEffect(() => {
         let ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 scrollTrigger: {

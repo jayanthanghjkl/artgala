@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import TextRoll from '../common/TextRoll';
 import StaggeredMenu from './StaggeredMenu';
 
@@ -20,30 +21,24 @@ export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered })
 
           {/* Desktop Navigation Links */}
           <nav className="flex items-center gap-6 py-2.5 opacity-90">
-            <a 
-              href="#about" 
+            <Link 
+              to="/#about" 
               className="group/link font-body text-xs font-semibold uppercase tracking-[3px] text-pure-white transition-all duration-300"
             >
               <TextRoll text="ABOUT" />
-            </a>
-            <a 
-              href="#skills" 
+            </Link>
+            <Link 
+              to="/projects" 
               className="group/link font-body text-xs font-semibold uppercase tracking-[3px] text-pure-white transition-all duration-300"
             >
-              <TextRoll text="SKILLS" />
-            </a>
-            <a 
-              href="#projects" 
-              className="group/link font-body text-xs font-semibold uppercase tracking-[3px] text-pure-white transition-all duration-300"
-            >
-              <TextRoll text="PROJECTS" />
-            </a>
-            <a 
-              href="#contact" 
+              <TextRoll text="WORKS" />
+            </Link>
+            <Link 
+              to="/#contact" 
               className="group/link font-body text-xs font-semibold uppercase tracking-[3px] text-pure-white transition-all duration-300"
             >
               <TextRoll text="CONTACT" />
-            </a>
+            </Link>
           </nav>
         </div>
 
@@ -52,10 +47,9 @@ export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered })
           <StaggeredMenu
             position="right"
             items={[
-              { label: 'About', ariaLabel: 'Go to about', link: '#about' },
-              { label: 'Skills', ariaLabel: 'Go to skills', link: '#skills' },
-              { label: 'Projects', ariaLabel: 'Go to projects', link: '#projects' },
-              { label: 'Contact', ariaLabel: 'Go to contact', link: '#contact' }
+              { label: 'About', ariaLabel: 'Go to about', link: '/#about' },
+              { label: 'Works', ariaLabel: 'Go to works', link: '/projects' },
+              { label: 'Contact', ariaLabel: 'Go to contact', link: '/#contact' }
             ]}
             socialItems={[
               { label: 'Twitter', link: 'https://twitter.com' },

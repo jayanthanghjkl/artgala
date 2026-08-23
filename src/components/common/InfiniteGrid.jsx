@@ -105,39 +105,47 @@ export default function InfiniteGrid({ inView }) {
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   useEffect(() => { isDraggingRef.current = isDragging; }, [isDragging]);
 
+  const [hasAnimated, setHasAnimated] = useState(false);
+
   // ── Entrance Zoom & Pan swoop animation ────────────────────────────────────
   useEffect(() => {
-    if (inView) {
-      const animObj = { zoom: 2.2, panX: 0, panY: -250 };
-      
-      gsap.killTweensOf(animObj);
-      
-      gsap.to(animObj, {
-        zoom: 1.33,
-        panX: 0,
-        panY: 0,
-        duration: 1.6,
-        ease: 'power3.out',
-        onUpdate: () => {
-          setZoom(animObj.zoom);
-          setPan({ x: animObj.panX, y: animObj.panY });
+    if (inView && !hasAnimated) {
+      // Delay animation slightly to let React Router and ResizeObserver settle
+      const timer = setTimeout(() => {
+        const animObj = { zoom: 2.2, panX: 0, panY: -250 };
+        
+        gsap.killTweensOf(animObj);
+        
+        gsap.to(animObj, {
+          zoom: 1.33,
+          panX: 0,
+          panY: 0,
+          duration: 1.6,
+          ease: 'power3.out',
+          onUpdate: () => {
+            setZoom(animObj.zoom);
+            setPan({ x: animObj.panX, y: animObj.panY });
+          }
+        });
+        
+        // Stagger card items scale and opacity
+        const cardElems = containerRef.current?.querySelectorAll('.grid-card-item');
+        if (cardElems && cardElems.length > 0) {
+          gsap.fromTo(cardElems,
+            { opacity: 0, scale: 0.7 },
+            { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out', stagger: { each: 0.04, from: 'center' }, delay: 0.1 }
+          );
         }
-      });
-      
-      // Stagger card items scale and opacity
-      const cardElems = containerRef.current?.querySelectorAll('.grid-card-item');
-      if (cardElems && cardElems.length > 0) {
-        gsap.fromTo(cardElems,
-          { opacity: 0, scale: 0.7 },
-          { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out', stagger: { each: 0.04, from: 'center' }, delay: 0.1 }
-        );
-      }
-    } else {
+        setHasAnimated(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else if (!inView) {
       // Instantly reset coordinates and zoom when out of view
       setZoom(2.2);
       setPan({ x: 0, y: -250 });
+      setHasAnimated(false);
     }
-  }, [inView]);
+  }, [inView, hasAnimated]);
 
   // ── Responsive card dimensions ────────────────────────────────────────────
   const isMobile = viewport.width < 768;

@@ -7,26 +7,8 @@ import InfiniteGrid from '../../components/common/InfiniteGrid';
  * - Desktop: Transparent backdrop with a backdrop blur overlay revealing the global canvas.
  */
 export default function ProjectsPage() {
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true);
   const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        } else {
-          setInView(false);
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    return () => observer.disconnect();
-  }, []);
 
   return (
     // Changed bg-pure-black to bg-transparent so the global canvas can bleed through and blur
