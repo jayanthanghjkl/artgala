@@ -67,7 +67,7 @@ function CameraController({ spiralRef, cursorRef, isEntered }) {
 }
 
 // ── COMBINED HERO & 3D CANVAS COMPONENT ─────────────────────────────────────
-export default function HeroSection({ isEntered }) {
+export default function HeroSection({ isEntered, children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isHeroActive, setIsHeroActive] = useState(false);
 
@@ -231,9 +231,11 @@ export default function HeroSection({ isEntered }) {
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
         <div
-          className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[300px]"
+          className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[300px] flex items-center justify-center overflow-hidden"
           style={{ transform: 'scale(0)' }}
-        />
+        >
+          {children}
+        </div>
       </div>
 
       {/* HERO VIEW CONTENT (Unified for Mobile and Desktop) */}

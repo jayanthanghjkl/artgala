@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import HoverHighlightText from '../../components/effects/HoverHighlightText';
 import HalftoneReveal from '../../components/effects/HalftoneReveal';
+import VariableProximity from '../../components/effects/VariableProximity';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,7 +35,15 @@ export default function AboutPage() {
       {/* ── DESIGN TOP HALF: STRUCTURAL VISUAL ANCHOR ── */}
       <div className="w-full flex flex-col items-start pt-4 md:pt-2">
         <h2 className="about-h2-anim font-heading font-black text-[12vw] leading-[0.8] tracking-[-0.05em] uppercase text-neutral-800/80 select-none pointer-events-none">
-          ABOUT·ME
+          <VariableProximity
+            label="ABOUT·ME"
+            className="variable-proximity-demo"
+            fromFontVariationSettings="'wght' 900"
+            toFontVariationSettings="'wght' 300"
+            containerRef={containerRef}
+            radius={300}
+            falloff="linear"
+          />
         </h2>
         <div className="about-rule w-full h-[1px] mt-4 md:mt-6 mb-4 bg-[#d4d4d8]" />
       </div>
