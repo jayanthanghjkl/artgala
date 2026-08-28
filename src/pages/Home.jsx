@@ -1,5 +1,6 @@
 import React from 'react';
 import HeroTransitionWrapper from '../components/layout/HeroTransitionWrapper';
+import ProjectPage from './ProjectPage/ProjectPage';
 import GalleryPage from './GalleryPage/GalleryPage';
 import StaggeredGrid from './SkillsPage/staggeredGrid';
 import Footer25 from '../components/ui/Footer25';
@@ -11,7 +12,10 @@ export default function Home() {
       {/* Master Wrapper for Hero and About transitions */}
       <HeroTransitionWrapper />
 
-      {/* Scroll-linked Gallery Section */}
+      {/* Project Section (formerly Gallery) */}
+      <ProjectPage />
+
+      {/* New Infinite Horizontal Gallery */}
       <GalleryPage />
 
       {/* Skills Section Container */}

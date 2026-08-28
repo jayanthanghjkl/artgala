@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
-import ProjectsRoute from './pages/ProjectsRoute';
+import WorkRoute from './pages/WorkRoute';
 import ProjectDetailPage from './pages/ProjectDetailPage/ProjectDetailPage';
 import ScrollToTop from './components/common/ScrollToTop';
 import Lenis from 'lenis';
@@ -39,7 +39,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/projects" element={<ProjectsRoute />} />
+        <Route path="/work" element={<WorkRoute />} />
       </Routes>
 
       <AnimatePresence>

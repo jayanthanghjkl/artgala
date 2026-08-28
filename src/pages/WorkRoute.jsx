@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ProjectsPage from './ProjectsPage/ProjectsPage';
+import { motion, AnimatePresence } from 'framer-motion';
+import WorkPage from './WorkPage/WorkPage';
 
-export default function ProjectsRoute() {
+export default function WorkRoute() {
   return (
     <div className="w-full h-screen bg-black overflow-hidden relative">
       {/* Absolute Header for Works Page */}
@@ -23,7 +24,7 @@ export default function ProjectsRoute() {
         <div className="w-[88px]"></div>
       </div>
 
-      <ProjectsPage />
+      <WorkPage />
     </div>
   );
 }
