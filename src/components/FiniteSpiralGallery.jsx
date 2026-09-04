@@ -249,30 +249,3 @@ export default function FiniteSpiralGallery({
   );
 }
 
-{/* 3D Helical Cards */ }
-{
-  items.map((item, idx) => (
-    <ProjectCard3D
-      key={item.id || idx}
-      item={item}
-      index={idx}
-      total={count}
-      progressRef={progressRef}
-      isHovered={hoveredIdx === idx}
-      onHover={setHoveredIdx}
-      onSelect={handleSelectCard}
-    />
-  ))
-}
-          </Suspense >
-
-  <CameraRig
-    progressRef={progressRef}
-    cursorRef={cursorRef}
-    total={count}
-  />
-        </Canvas >
-      </div >
-    </section >
-  );
-}
