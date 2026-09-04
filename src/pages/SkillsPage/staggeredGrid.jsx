@@ -104,9 +104,7 @@ export function StaggeredGrid({
     className
 }) {
     const containerRef = useRef(null)
-    const captionRef = useRef(null)
     const titleRef = useRef(null)
-    const subtitleRef = useRef(null)
     const gridRef = useRef(null)
 
     // Helper logic: Splitting text for character cascades
@@ -124,46 +122,32 @@ export function StaggeredGrid({
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,
-                    start: 'top 70%', // Play when top of section hits 70% viewport
+                    start: 'top 70%',
                     toggleActions: 'play none none reverse',
                 }
             });
 
-            // Caption Entrance
-            if (captionRef.current) {
-                tl.fromTo(captionRef.current,
-                    { opacity: 0, y: 15 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
-                );
-            }
-
             // Title Characters
             if (titleRef.current) {
                 const chars = titleRef.current.querySelectorAll('.char');
-                tl.fromTo(chars,
-                    { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.012 },
-                    '-=0.3'
-                );
-            }
-
-            // Subtitle Description
-            if (subtitleRef.current) {
-                tl.fromTo(subtitleRef.current,
-                    { opacity: 0, y: 15 },
-                    { opacity: 0.7, y: 0, duration: 0.5, ease: 'power3.out' },
-                    '-=0.3'
-                );
+                if (chars && chars.length > 0) {
+                    tl.fromTo(chars,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.012 }
+                    );
+                }
             }
 
             // Cards Stagger
             if (gridRef.current) {
                 const cards = gridRef.current.querySelectorAll('.grid-card');
-                tl.fromTo(cards,
-                    { opacity: 0, y: 40 },
-                    { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.04 },
-                    '-=0.3'
-                );
+                if (cards && cards.length > 0) {
+                    tl.fromTo(cards,
+                        { opacity: 0, y: 40 },
+                        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.04 },
+                        '-=0.2'
+                    );
+                }
             }
         }, containerRef);
 
@@ -187,11 +171,11 @@ export function StaggeredGrid({
                 }}
             />
 
-            {/* Background Layer 1: Large radial glow from top center */}
+            {/* Background Layer 1: Large radial glow from center */}
             <div
                 className="absolute inset-0 z-0 pointer-events-none"
                 style={{
-                    background: 'radial-gradient(circle_at_center,rgba(230, 0, 38, 0.5)_0%,transparent_60%)'
+                    background: 'radial-gradient(circle_at_center,rgba(230, 0, 38, 0.45)_0%,transparent_60%)'
                 }}
             />
 

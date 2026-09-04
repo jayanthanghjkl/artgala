@@ -1,7 +1,6 @@
 import React from 'react';
 import HeroTransitionWrapper from '../components/layout/HeroTransitionWrapper';
 import ProjectPage from './ProjectPage/ProjectPage';
-import GalleryPage from './GalleryPage/GalleryPage';
 import StaggeredGrid from './SkillsPage/staggeredGrid';
 import Footer25 from '../components/ui/Footer25';
 import { skillsBentoItems, skillsGridImages } from '../data/skills';
@@ -12,11 +11,8 @@ export default function Home() {
       {/* Master Wrapper for Hero and About transitions */}
       <HeroTransitionWrapper />
 
-      {/* Project Section (formerly Gallery) */}
+      {/* Unified Project & Gallery Showcase with single persistent static background */}
       <ProjectPage />
-
-      {/* New Infinite Horizontal Gallery */}
-      <GalleryPage />
 
       {/* Skills Section Container */}
       <div id="skills" className="w-full relative z-20 bg-[#101010]">

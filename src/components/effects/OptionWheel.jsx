@@ -34,6 +34,7 @@ const OptionWheel = ({
   inset = 80,
   loop = false,
   draggable = true,
+  maxOverscroll = 0,
   soundUrl = '',
   soundVolume = 0.5,
   className = ''
@@ -47,7 +48,6 @@ const OptionWheel = ({
   const cfgRef = useRef({});
   const onChangeRef = useRef(onChange);
   const selectedRef = useRef(defaultSelected);
-  const wheelTimerRef = useRef(null);
   const dragRef = useRef(null);
   const dragMovedRef = useRef(false);
   const audioRef = useRef(null);
@@ -84,10 +84,10 @@ const OptionWheel = ({
     loop,
     smoothing,
     draggable,
+    maxOverscroll,
     soundUrl,
     soundVolume
   };
-
 
   const runFrame = useCallback(now => {
     const dt = Math.min((now - lastRef.current) / 1000, 0.05);
@@ -127,7 +127,11 @@ const OptionWheel = ({
         rot = (mirror * ang * 180) / Math.PI;
       }
       el.style.transform = `translate(${x.toFixed(2)}px, calc(${y.toFixed(2)}px - 50%)) rotate(${rot.toFixed(3)}deg)`;
-      el.style.opacity = String(Math.max(cfg.minOpacity, 1 - dist * cfg.fade));
+      
+      const rawOpacity = 1 - dist * cfg.fade;
+      const opacityVal = rawOpacity <= 0 ? 0 : Math.max(cfg.minOpacity, rawOpacity);
+      el.style.opacity = String(opacityVal);
+
       el.style.filter = cfg.blur > 0 ? `blur(${(dist * cfg.blur).toFixed(2)}px)` : 'none';
       el.style.setProperty('--ow-p', Math.max(0, 1 - Math.min(dist, 1)).toFixed(4));
     }
@@ -164,10 +168,12 @@ const OptionWheel = ({
     (value, snap) => {
       const cfg = cfgRef.current;
       let v = value;
-      if (!cfg.loop) v = Math.min(Math.max(v, 0), Math.max(cfg.count - 1, 0));
+      const overscroll = cfg.maxOverscroll || 0;
+      if (!cfg.loop) v = Math.min(Math.max(v, -overscroll), Math.max(cfg.count - 1 + overscroll, 0));
       if (snap) v = Math.round(v);
       targetRef.current = v;
-      const idx = ((Math.round(v) % cfg.count) + cfg.count) % cfg.count;
+      const clampedIdx = Math.min(Math.max(Math.round(v), 0), cfg.count - 1);
+      const idx = ((clampedIdx % cfg.count) + cfg.count) % cfg.count;
       if (idx !== selectedRef.current) {
         selectedRef.current = idx;
         setSelectedIndex(idx);
@@ -189,8 +195,6 @@ const OptionWheel = ({
       }
     }
   }, [controlledIndex, applyTarget]);
-
-  // Native wheel scroll interception removed to prevent conflicts with GSAP ScrollTrigger
 
   const handlePointerDown = useCallback(e => {
     if (!cfgRef.current.draggable) return;
@@ -252,7 +256,7 @@ const OptionWheel = ({
     if (controlledIndex === undefined) {
       applyTarget(targetRef.current, false);
     }
-  }, [items, fontSize, spacing, curve, tilt, blur, fade, minOpacity, side, loop, smoothing, applyTarget, controlledIndex]);
+  }, [items, fontSize, spacing, curve, tilt, blur, fade, minOpacity, side, loop, smoothing, maxOverscroll, applyTarget, controlledIndex]);
 
   useEffect(
     () => () => {

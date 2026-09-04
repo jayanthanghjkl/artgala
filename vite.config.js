@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +14,12 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+  },
   server: {
     allowedHosts: [
       'unvitiable-amya-dimensionally.ngrok-free.dev',
@@ -29,7 +39,7 @@ export default defineConfig({
               return 'vendor-3d';
             }
             // Separates heavy runtime vector animations into an isolated block
-            if (id.includes('gsap') || id.includes('framer-motion')) {
+            if (id.includes('gsap') || id.includes('framer-motion') || id.includes('motion')) {
               return 'vendor-motion';
             }
           }
