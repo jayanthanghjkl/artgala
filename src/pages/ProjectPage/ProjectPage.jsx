@@ -14,6 +14,8 @@ export default function ProjectPage() {
   const imageContainerRef = useRef(null);
   const projectShowcaseRef = useRef(null);
   const galleryShowcaseRef = useRef(null);
+  const cameraWipeRef = useRef(null);
+  const cameraWipeEdgeRef = useRef(null);
   const wheelContainerRef = useRef(null);
   const imageCardRef = useRef(null);
   
@@ -55,7 +57,7 @@ export default function ProjectPage() {
       // 0.40 -> 0.55: Phase 2 - Project Section animation finishes (Wheel empties out & moves up)
       // 0.55 -> 0.70: Phase 3 - Gallery Page animation starts (Floating cards ascend from bottom)
       // 0.70 -> 0.85: Phase 4 - Gallery Showcase fully active & interactive
-      // 0.85 -> 1.00: Phase 5 - Moving to next page: Gallery fades out while moving to the right
+      // 0.85 -> 1.00: Phase 5 - Object Over Camera Wipe Transition into Skills page
       const p1End = 0.40;
       const p2End = 0.55;
       const p3End = 0.70;
@@ -96,7 +98,13 @@ export default function ProjectPage() {
               gsap.set(projectShowcaseRef.current, { x: 0, y: 0, opacity: 1, pointerEvents: 'auto' });
             }
             if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, opacity: 0, pointerEvents: 'none' });
+              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, scale: 1, filter: 'none', opacity: 0, pointerEvents: 'none' });
+            }
+            if (cameraWipeRef.current) {
+              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
+            }
+            if (cameraWipeEdgeRef.current) {
+              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
             }
           } else if (p >= p1End && p < p2End) {
             // PHASE 2: Project section animation finishes (Wheel empties out and moves up)
@@ -120,13 +128,21 @@ export default function ProjectPage() {
 
             // Gallery remains hidden below until project section finishes
             if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, opacity: 0, pointerEvents: 'none' });
+              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, scale: 1, filter: 'none', opacity: 0, pointerEvents: 'none' });
+            }
+            if (cameraWipeRef.current) {
+              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
+            }
+            if (cameraWipeEdgeRef.current) {
+              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
             }
           } else if (p >= p2End && p < p3End) {
-            // PHASE 3: Project section finished -> Gallery animation starts & ascends from bottom
+            // PHASE 3: Project section finished -> Gallery ascends from bottom until it fits the screen
             const enterP = (p - p2End) / (p3End - p2End);
             setWheelScrollIndex(maxIndex + 5.0);
-            setIsGalleryActive(true);
+            
+            // Keep floating gallery animation inactive until the page is fully centered & fit to screen
+            setIsGalleryActive(false);
 
             // Project section is completely gone off the top
             if (projectShowcaseRef.current) {
@@ -138,12 +154,20 @@ export default function ProjectPage() {
               gsap.set(galleryShowcaseRef.current, {
                 x: 0,
                 y: (1 - enterP) * 380,
+                scale: 1,
+                filter: 'none',
                 opacity: Math.min(1, enterP * 1.3),
-                pointerEvents: enterP > 0.4 ? 'auto' : 'none'
+                pointerEvents: 'none'
               });
             }
+            if (cameraWipeRef.current) {
+              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
+            }
+            if (cameraWipeEdgeRef.current) {
+              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
+            }
           } else if (p >= p3End && p < p4End) {
-            // PHASE 4: Gallery fully active and centered
+            // PHASE 4: Gallery page is now 100% FIT TO SCREEN -> Floating animation starts!
             setWheelScrollIndex(maxIndex + 5.0);
             setIsGalleryActive(true);
 
@@ -151,10 +175,16 @@ export default function ProjectPage() {
               gsap.set(projectShowcaseRef.current, { x: 0, y: -380, opacity: 0, pointerEvents: 'none' });
             }
             if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, opacity: 1, pointerEvents: 'auto' });
+              gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, filter: 'none', opacity: 1, pointerEvents: 'auto' });
+            }
+            if (cameraWipeRef.current) {
+              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
+            }
+            if (cameraWipeEdgeRef.current) {
+              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
             }
           } else {
-            // PHASE 5: Moving to next page from gallery -> Fade out + simultaneous moving right
+            // PHASE 5: Transition to Skills Page -> Object Over Camera Wipe Transition Effect
             const nextP = (p - p4End) / (1 - p4End);
             setWheelScrollIndex(maxIndex + 5.0);
 
@@ -162,14 +192,39 @@ export default function ProjectPage() {
               gsap.set(projectShowcaseRef.current, { x: 0, y: -380, opacity: 0, pointerEvents: 'none' });
             }
 
-            // Gallery fades out at the same time as sliding to the right
+            // Object over the camera 3D zoom & cinematic fly-past
             if (galleryShowcaseRef.current) {
-              const moveX = nextP * (typeof window !== 'undefined' ? window.innerWidth * 0.8 : 900);
+              const zoomScale = 1 + Math.pow(nextP, 1.3) * 6.5;
+              const cardBlur = nextP * 14;
+              const cardOpacity = Math.max(0, 1 - Math.pow(nextP, 1.25) * 1.5);
+
               gsap.set(galleryShowcaseRef.current, {
-                x: moveX,
+                x: 0,
                 y: 0,
-                opacity: Math.max(0, 1 - nextP * 1.3),
-                pointerEvents: nextP > 0.3 ? 'none' : 'auto'
+                scale: zoomScale,
+                opacity: cardOpacity,
+                filter: cardBlur > 0.5 ? `blur(${cardBlur.toFixed(1)}px)` : 'none',
+                pointerEvents: nextP > 0.15 ? 'none' : 'auto'
+              });
+            }
+
+            // Object Camera Wipe Aperture Layer unrolling over the camera lens
+            if (cameraWipeRef.current) {
+              const easedWipe = Math.pow(nextP, 1.15);
+              const remainingInset = ((1 - easedWipe) * 100).toFixed(2);
+              gsap.set(cameraWipeRef.current, {
+                clipPath: `inset(0% 0% ${remainingInset}% 0%)`,
+                opacity: nextP > 0.01 ? 1 : 0
+              });
+            }
+
+            // Glowing Leading Edge Laser Beam
+            if (cameraWipeEdgeRef.current) {
+              const easedWipe = Math.pow(nextP, 1.15);
+              const edgePos = (easedWipe * 100).toFixed(2);
+              gsap.set(cameraWipeEdgeRef.current, {
+                top: `${edgePos}%`,
+                opacity: nextP > 0.02 && nextP < 0.98 ? 1 : 0
               });
             }
           }
