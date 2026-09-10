@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import OptionWheel from '../../components/effects/OptionWheel';
 import { ParallaxFloatingDemo } from '../../components/ui/parallax-floating-demo';
+import TiltedCard from '../../components/ui/TiltedCard';
 import { projectsList } from '../../data/projects';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +24,12 @@ export default function ProjectPage() {
   const [wheelScrollIndex, setWheelScrollIndex] = useState(0);
   const [isPinned, setIsPinned] = useState(false);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
-  const [isGalleryActive, setIsGalleryActive] = useState(false);
+  const [galleryProgress, setGalleryProgress] = useState(0);
+
+  // Performance tracking refs to prevent redundant React re-renders during high-frequency scroll
+  const activeIndexRef = useRef(0);
+  const wheelIndexRef = useRef(0);
+  const galleryProgressRef = useRef(0);
 
   // Filter out the featured text item, we only want actual projects with images
   const galleryProjects = projectsList.filter(p => p.image);
@@ -52,32 +58,32 @@ export default function ProjectPage() {
     if (!containerRef.current || !innerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Precise timeline segmentation:
-      // 0.00 -> 0.40: Phase 1 - Project Wheel items cycle (with 3D Card Flipping from bottom to top)
-      // 0.40 -> 0.55: Phase 2 - Project Section animation finishes (Wheel empties out & moves up)
-      // 0.55 -> 0.70: Phase 3 - Gallery Page animation starts (Floating cards ascend from bottom)
-      // 0.70 -> 0.85: Phase 4 - Gallery Showcase fully active & interactive
-      // 0.85 -> 1.00: Phase 5 - Object Over Camera Wipe Transition into Skills page
-      const p1End = 0.40;
-      const p2End = 0.55;
-      const p3End = 0.70;
-      const p4End = 0.85;
+      // Timeline segmentation:
+      // 0.00 -> 0.35: Act 1 - Dial & 3D Cards (0% – 35%)
+      // 0.35 -> 0.40: Act 2 - Wheel Swift Exit (35% – 40%)
+      // 0.36 -> 1.00: Act 3 - Master Floating Gallery Sequence (starts immediately as wheel exits)
+      const p1End = 0.35;
+      const p2End = 0.40;
+      const galleryStart = 0.36;
 
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: 'top top',
-        end: `+=${galleryProjects.length * 150 + 400}vh`,
+        end: `+=${galleryProjects.length * 120 + 750}vh`,
         pin: true,
-        scrub: true,
+        scrub: 1.0, // Responsive, fluid catch-up curve
+        anticipatePin: 1,
+        fastScrollEnd: false, // Prevents GSAP from forcing animations to jump straight to the end
         snap: {
-          snapTo: (predictedProgress) => {
-            if (predictedProgress >= p1End) return predictedProgress;
+          // Snap strictly within Phase 1 (0.0 to 0.35) to catch each project
+          snapTo: (value) => {
+            if (value > p1End) return value; // Let gallery phases scroll seamlessly
             const maxIndex = galleryProjects.length - 1;
             const step = p1End / maxIndex;
-            const predictedIndex = Math.round(predictedProgress / step);
-            return Math.min(maxIndex, Math.max(0, predictedIndex)) * step;
+            return Math.min(p1End, Math.max(0, Math.round(value / step) * step));
           },
-          duration: 0.35,
+          directional: true,
+          duration: { min: 0.2, max: 0.5 },
           delay: 0.05,
           ease: "power1.inOut"
         },
@@ -86,145 +92,72 @@ export default function ProjectPage() {
           const p = self.progress;
           const maxIndex = galleryProjects.length - 1;
 
+          // ACT 1: Dial & 3D Cards (0% – 35%)
           if (p < p1End) {
-            // PHASE 1: Project Wheel Active
             const normP = p / p1End;
             const targetIndex = normP * maxIndex;
+            const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
+            
+            wheelIndexRef.current = targetIndex;
             setWheelScrollIndex(targetIndex);
-            setActiveIndex(Math.min(maxIndex, Math.max(0, Math.round(targetIndex))));
-            setIsGalleryActive(false);
+
+            if (newActive !== activeIndexRef.current) {
+              activeIndexRef.current = newActive;
+              setActiveIndex(newActive);
+            }
+            if (galleryProgressRef.current !== 0) {
+              galleryProgressRef.current = 0;
+              setGalleryProgress(0);
+            }
 
             if (projectShowcaseRef.current) {
               gsap.set(projectShowcaseRef.current, { x: 0, y: 0, opacity: 1, pointerEvents: 'auto' });
             }
             if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, scale: 1, filter: 'none', opacity: 0, pointerEvents: 'none' });
-            }
-            if (cameraWipeRef.current) {
-              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
-            }
-            if (cameraWipeEdgeRef.current) {
-              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
-            }
-          } else if (p >= p1End && p < p2End) {
-            // PHASE 2: Project section animation finishes (Wheel empties out and moves up)
-            const exitP = (p - p1End) / (p2End - p1End);
-            
-            // Advance wheel index to empty out the wheel
-            const targetIndex = maxIndex + exitP * 4.5;
-            setWheelScrollIndex(targetIndex);
-            setActiveIndex(maxIndex);
-            setIsGalleryActive(false);
-
-            // Project showcase glides up off the top and fades
-            if (projectShowcaseRef.current) {
-              gsap.set(projectShowcaseRef.current, {
-                x: 0,
-                y: -exitP * 380,
-                opacity: Math.max(0, 1 - exitP * 1.2),
-                pointerEvents: exitP > 0.6 ? 'none' : 'auto'
-              });
-            }
-
-            // Gallery remains hidden below until project section finishes
-            if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 400, scale: 1, filter: 'none', opacity: 0, pointerEvents: 'none' });
-            }
-            if (cameraWipeRef.current) {
-              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
-            }
-            if (cameraWipeEdgeRef.current) {
-              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
-            }
-          } else if (p >= p2End && p < p3End) {
-            // PHASE 3: Project section finished -> Gallery ascends from bottom until it fits the screen
-            const enterP = (p - p2End) / (p3End - p2End);
-            setWheelScrollIndex(maxIndex + 5.0);
-            
-            // Keep floating gallery animation inactive until the page is fully centered & fit to screen
-            setIsGalleryActive(false);
-
-            // Project section is completely gone off the top
-            if (projectShowcaseRef.current) {
-              gsap.set(projectShowcaseRef.current, { x: 0, y: -380, opacity: 0, pointerEvents: 'none' });
-            }
-
-            // Gallery ascends from the bottom into the center
-            if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, {
-                x: 0,
-                y: (1 - enterP) * 380,
-                scale: 1,
-                filter: 'none',
-                opacity: Math.min(1, enterP * 1.3),
-                pointerEvents: 'none'
-              });
-            }
-            if (cameraWipeRef.current) {
-              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
-            }
-            if (cameraWipeEdgeRef.current) {
-              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
-            }
-          } else if (p >= p3End && p < p4End) {
-            // PHASE 4: Gallery page is now 100% FIT TO SCREEN -> Floating animation starts!
-            setWheelScrollIndex(maxIndex + 5.0);
-            setIsGalleryActive(true);
-
-            if (projectShowcaseRef.current) {
-              gsap.set(projectShowcaseRef.current, { x: 0, y: -380, opacity: 0, pointerEvents: 'none' });
-            }
-            if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, filter: 'none', opacity: 1, pointerEvents: 'auto' });
-            }
-            if (cameraWipeRef.current) {
-              gsap.set(cameraWipeRef.current, { clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 });
-            }
-            if (cameraWipeEdgeRef.current) {
-              gsap.set(cameraWipeEdgeRef.current, { opacity: 0 });
+              gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, opacity: 0, pointerEvents: 'none' });
             }
           } else {
-            // PHASE 5: Transition to Skills Page -> Object Over Camera Wipe Transition Effect
-            const nextP = (p - p4End) / (1 - p4End);
-            setWheelScrollIndex(maxIndex + 5.0);
+            // ACT 2 & 3: Smooth Cross-Transition from Wheel Exit directly into Gallery Entrance
+            // Phase 2: Wheel glides up and dissolves (0.35 -> 0.40)
+            const exitP = Math.min(1, Math.max(0, (p - p1End) / (p2End - p1End)));
+            const targetIndex = maxIndex + exitP * 2.5;
+            
+            wheelIndexRef.current = targetIndex;
+            setWheelScrollIndex(targetIndex);
 
             if (projectShowcaseRef.current) {
-              gsap.set(projectShowcaseRef.current, { x: 0, y: -380, opacity: 0, pointerEvents: 'none' });
+              const projectOpacity = Math.max(0, 1 - exitP * 1.2);
+              gsap.set(projectShowcaseRef.current, {
+                x: 0,
+                y: -exitP * 220,
+                opacity: projectOpacity,
+                pointerEvents: exitP > 0.4 ? 'none' : 'auto'
+              });
             }
 
-            // Object over the camera 3D zoom & cinematic fly-past
+            // Gallery progression starts blending in at 0.35
+            const galleryP = Math.min(1, Math.max(0, (p - galleryStart) / (1.00 - galleryStart)));
+            
+            if (Math.abs(galleryP - galleryProgressRef.current) > 0.001) {
+              galleryProgressRef.current = galleryP;
+              setGalleryProgress(galleryP);
+            }
+
             if (galleryShowcaseRef.current) {
-              const zoomScale = 1 + Math.pow(nextP, 1.3) * 6.5;
-              const cardBlur = nextP * 14;
-              const cardOpacity = Math.max(0, 1 - Math.pow(nextP, 1.25) * 1.5);
+              // Smooth cross-fade entrance when gallery starts (0 to 1 over first 6%), and exit dissolve at end (> 0.96)
+              let galleryOpacity = 1;
+              if (galleryP < 0.08) {
+                galleryOpacity = galleryP / 0.08;
+              } else if (galleryP > 0.96) {
+                galleryOpacity = Math.max(0, (1 - galleryP) / 0.04);
+              }
 
               gsap.set(galleryShowcaseRef.current, {
                 x: 0,
                 y: 0,
-                scale: zoomScale,
-                opacity: cardOpacity,
-                filter: cardBlur > 0.5 ? `blur(${cardBlur.toFixed(1)}px)` : 'none',
-                pointerEvents: nextP > 0.15 ? 'none' : 'auto'
-              });
-            }
-
-            // Object Camera Wipe Aperture Layer unrolling over the camera lens
-            if (cameraWipeRef.current) {
-              const easedWipe = Math.pow(nextP, 1.15);
-              const remainingInset = ((1 - easedWipe) * 100).toFixed(2);
-              gsap.set(cameraWipeRef.current, {
-                clipPath: `inset(0% 0% ${remainingInset}% 0%)`,
-                opacity: nextP > 0.01 ? 1 : 0
-              });
-            }
-
-            // Glowing Leading Edge Laser Beam
-            if (cameraWipeEdgeRef.current) {
-              const easedWipe = Math.pow(nextP, 1.15);
-              const edgePos = (easedWipe * 100).toFixed(2);
-              gsap.set(cameraWipeEdgeRef.current, {
-                top: `${edgePos}%`,
-                opacity: nextP > 0.02 && nextP < 0.98 ? 1 : 0
+                scale: 1,
+                opacity: galleryOpacity,
+                pointerEvents: galleryP >= 0.48 && galleryP < 0.76 ? 'auto' : 'none'
               });
             }
           }
@@ -322,6 +255,7 @@ export default function ProjectPage() {
               tilt={10}
               spacing={1.8}
               fontSize={3.5}
+              smoothing={50}
             />
           </div>
 
@@ -329,79 +263,91 @@ export default function ProjectPage() {
           <div 
             ref={imageCardRef}
             className="w-full md:w-1/2 h-full relative z-0 flex items-center justify-center p-4 md:p-8" 
-            style={{ perspective: '1500px' }}
+            style={{
+              perspective: '1200px',
+              perspectiveOrigin: 'center center',
+              transformStyle: 'preserve-3d'
+            }}
           >
             <div 
               ref={imageContainerRef}
-              className="relative w-full max-w-2xl aspect-[4/3] flex items-center justify-center cursor-none transform-gpu"
+              className="relative w-full max-w-2xl aspect-[4/3] flex items-center justify-center transform-gpu"
               style={{ transformStyle: 'preserve-3d' }}
-              onMouseEnter={() => setIsHoveringImage(true)}
-              onMouseMove={(e) => {
-                if (!imageContainerRef.current) return;
-                const rect = imageContainerRef.current.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -12;
-                const rotateY = ((x - centerX) / centerX) * 12;
-                gsap.to(imageContainerRef.current, { rotationX: rotateX, rotationY: rotateY, duration: 0.4, ease: 'power2.out' });
-              }}
-              onMouseLeave={() => {
-                setIsHoveringImage(false);
-                gsap.to(imageContainerRef.current, { rotationX: 0, rotationY: 0, duration: 0.7, ease: 'power3.out' });
-              }}
             >
               {galleryProjects.map((project, idx) => {
-                const isActive = activeIndex === idx;
-                const isPast = idx < activeIndex;
-                const isFuture = idx > activeIndex;
+                const diff = idx - wheelScrollIndex;
+                const isNear = Math.abs(diff) < 1.6;
 
-                // 3D Bottom-to-Top Whole Div Flip transforms
+                // Continuous 3D flip transform calculation (linear scrub, zero step-jumping)
                 let transformStyle = 'translate3d(0, 0, 0) rotateX(0deg) scale(1)';
-                let opacity = 1;
-                let zIndex = 10;
+                let opacity = 0;
+                let zIndex = 0;
+                let transformOrigin = 'center center';
 
-                if (isPast) {
-                  // The entire card div flips upwards and rotates away to the top
-                  transformStyle = 'translate3d(0, -90%, -120px) rotateX(85deg) scale(0.88)';
-                  opacity = 0;
-                  zIndex = 0;
-                } else if (isFuture) {
-                  // The entire card div waits below and flips UP from the bottom
-                  transformStyle = 'translate3d(0, 90%, -120px) rotateX(-85deg) scale(0.88)';
-                  opacity = 0;
-                  zIndex = 0;
+                if (isNear) {
+                  if (diff <= 0) {
+                    // Card is active or flipping up and away to the top (0 to -1.5)
+                    const clamped = Math.max(-1, diff);
+                    const y = clamped * 90;
+                    const z = clamped * 120;
+                    const rotX = -clamped * 80;
+                    const scale = 1 + clamped * 0.12;
+                    opacity = Math.max(0, 1 + clamped * 1.4);
+                    zIndex = Math.round(10 + clamped * 5);
+                    transformOrigin = 'top center';
+                    transformStyle = `translate3d(0, ${y.toFixed(2)}%, ${z.toFixed(2)}px) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(3)}) translateZ(0)`;
+                  } else {
+                    // Card is upcoming and flipping up from the bottom (1.5 to 0)
+                    const clamped = Math.min(1, diff);
+                    const y = clamped * 90;
+                    const z = -clamped * 120;
+                    const rotX = -clamped * 80;
+                    const scale = 1 - clamped * 0.12;
+                    opacity = Math.max(0, 1 - clamped * 1.4);
+                    zIndex = Math.round(10 - clamped * 5);
+                    transformOrigin = 'bottom center';
+                    transformStyle = `translate3d(0, ${y.toFixed(2)}%, ${z.toFixed(2)}px) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(3)}) translateZ(0)`;
+                  }
                 }
+
+                const isExactActive = Math.abs(diff) < 0.4;
 
                 return (
                   <a
                     key={project.id}
                     href={`#project-${project.id}`}
-                    className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.7)] bg-zinc-900 block will-change-transform transform-gpu"
+                    className="absolute inset-0 w-full h-full rounded-2xl overflow-visible block will-change-transform transform-gpu cursor-pointer"
                     style={{
                       transform: transformStyle,
                       opacity: opacity,
                       zIndex: zIndex,
-                      pointerEvents: isActive ? 'auto' : 'none',
-                      transformOrigin: isPast ? 'top center' : 'bottom center',
-                      transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+                      pointerEvents: isExactActive ? 'auto' : 'none',
+                      transformOrigin: transformOrigin,
                       backfaceVisibility: 'hidden',
                       transformStyle: 'preserve-3d'
                     }}
                   >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover rounded-3xl"
+                    <TiltedCard
+                      imageSrc={project.image}
+                      altText={project.title}
+                      captionText={project.title}
+                      containerHeight="100%"
+                      containerWidth="100%"
+                      imageHeight="100%"
+                      imageWidth="100%"
+                      rotateAmplitude={14}
+                      scaleOnHover={1.12}
+                      showMobileWarning={false}
+                      showTooltip={true}
+                      displayOverlayContent={true}
+                      overlayContent={
+                        <div className="w-full">
+                          <p className="tilted-card-demo-text flex items-center justify-between">
+                            <span>{project.title}</span>
+                          </p>
+                        </div>
+                      }
                     />
-                    {/* Dynamic 3D depth sheen / lighting overlay on the whole card */}
-                    <div 
-                      className="absolute inset-0 rounded-3xl pointer-events-none transition-opacity duration-700 bg-gradient-to-t from-black/70 via-transparent to-white/15"
-                      style={{ opacity: isActive ? 0.12 : 0.85 }}
-                    />
-                    {/* Glass border reflection overlay on the whole card */}
-                    <div className="absolute inset-0 border border-white/10 rounded-3xl pointer-events-none mix-blend-overlay" />
                   </a>
                 );
               })}
@@ -416,7 +362,7 @@ export default function ProjectPage() {
           ref={galleryShowcaseRef}
           className="absolute inset-0 z-20 w-full h-full flex items-center justify-center will-change-transform pointer-events-none opacity-0"
         >
-          <ParallaxFloatingDemo isActive={isGalleryActive} />
+          <ParallaxFloatingDemo progress={galleryProgress} />
         </div>
       </div>
 

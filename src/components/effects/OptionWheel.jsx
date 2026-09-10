@@ -1,23 +1,13 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
 const DEFAULT_ITEMS = [
-  'Ambient',
-  'House',
-  'Techno',
-  'Jazz',
-  'Lo-Fi',
-  'Synthwave',
-  'Trance',
-  'Funk',
-  'Disco',
-  'Hip-Hop',
-  'Chillwave',
-  'Drum & Bass'
+  'Ambient', 'House', 'Techno', 'Jazz', 'Lo-Fi', 'Synthwave',
+  'Trance', 'Funk', 'Disco', 'Hip-Hop', 'Chillwave', 'Drum & Bass'
 ];
 
 const OptionWheel = ({
   items = DEFAULT_ITEMS,
-  defaultSelected = 3,
+  defaultSelected = 0,
   controlledIndex,
   onChange,
   textColor = '#a6a6a6',
@@ -27,16 +17,13 @@ const OptionWheel = ({
   spacing = 1.4,
   curve = 1,
   tilt = 6,
-  blur = 2,
-  fade = 0.25,
-  minOpacity = 0.05,
-  smoothing = 200,
+  fade = 0.3,
+  minOpacity = 0.08,
+  smoothing = 180,
   inset = 80,
   loop = false,
-  draggable = true,
+  draggable = false,
   maxOverscroll = 0,
-  soundUrl = '',
-  soundVolume = 0.5,
   className = ''
 }) => {
   const rootRef = useRef(null);
@@ -45,55 +32,63 @@ const OptionWheel = ({
   const targetRef = useRef(defaultSelected);
   const rafRef = useRef(null);
   const lastRef = useRef(0);
-  const cfgRef = useRef({});
   const onChangeRef = useRef(onChange);
   const selectedRef = useRef(defaultSelected);
   const dragRef = useRef(null);
   const dragMovedRef = useRef(false);
-  const audioRef = useRef(null);
-  const audioUrlRef = useRef('');
-  const lastTickRef = useRef(0);
+
   const [selectedIndex, setSelectedIndex] = useState(defaultSelected);
   const [isDragging, setIsDragging] = useState(false);
 
-  let remPx = 16;
-  if (typeof window !== 'undefined') {
-    const fs = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    if (!isNaN(fs) && fs > 0) {
-      remPx = fs;
-    }
-  }
-
   onChangeRef.current = onChange;
-  
-  // Safely calculate row height, ensuring no NaN propagates
-  const safeFontSize = isNaN(fontSize) ? 3 : fontSize;
-  const safeSpacing = isNaN(spacing) ? 1.4 : spacing;
-  const calculatedRowH = safeFontSize * safeSpacing * remPx;
-  
-  cfgRef.current = {
-    count: items.length,
-    items,
-    rowH: isNaN(calculatedRowH) ? 50 : Math.max(calculatedRowH, 1),
-    curve,
-    tilt,
-    blur,
-    fade,
-    minOpacity,
-    side,
-    loop,
-    smoothing,
-    draggable,
-    maxOverscroll,
-    soundUrl,
-    soundVolume
-  };
 
-  const runFrame = useCallback(now => {
+  const remPx = typeof window !== 'undefined' 
+    ? parseFloat(getComputedStyle(document.documentElement).fontSize) || 16 
+    : 16;
+  const rowH = Math.max((fontSize || 3) * (spacing || 1.4) * remPx, 1);
+
+  // Direct layout renderer without expensive CSS filter calculations
+  const renderLayout = useCallback((pos) => {
+    const els = itemRefs.current;
+    const n = items.length;
+    const mirror = side === 'right' ? -1 : 1;
+    const tiltRad = (tilt * Math.PI) / 180;
+    const R = tiltRad > 0.0005 ? rowH / tiltRad : 0;
+
+    for (let i = 0; i < n; i++) {
+      const el = els[i];
+      if (!el) continue;
+
+      let d = i - pos;
+      if (loop && n > 1) {
+        d = ((d % n) + n) % n;
+        if (d > n / 2) d -= n;
+      }
+      const dist = Math.abs(d);
+
+      let x = 0;
+      let y = d * rowH;
+      let rot = 0;
+      if (R > 0) {
+        const ang = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, d * tiltRad));
+        y = R * Math.sin(ang);
+        x = -mirror * R * (1 - Math.cos(ang)) * curve;
+        rot = (mirror * ang * 180) / Math.PI;
+      }
+
+      // GPU-accelerated transform3d
+      el.style.transform = `translate3d(${x.toFixed(1)}px, calc(${y.toFixed(1)}px - 50%), 0) rotate(${rot.toFixed(2)}deg)`;
+
+      const rawOpacity = 1 - dist * fade;
+      el.style.opacity = String(rawOpacity <= 0 ? 0 : Math.max(minOpacity, rawOpacity));
+    }
+  }, [items.length, side, tilt, rowH, loop, curve, fade, minOpacity]);
+
+  // Frame loop for manual dragging/pointer gestures
+  const runFrame = useCallback((now) => {
     const dt = Math.min((now - lastRef.current) / 1000, 0.05);
     lastRef.current = now;
-    const cfg = cfgRef.current;
-    const tau = Math.max(cfg.smoothing, 1) / 1000;
+    const tau = Math.max(smoothing, 1) / 1000;
     const k = 1 - Math.exp(-dt / tau);
 
     const target = targetRef.current;
@@ -103,119 +98,74 @@ const OptionWheel = ({
     if (settled) next = target;
     posRef.current = next;
 
-    const els = itemRefs.current;
-    const n = cfg.count;
-    const mirror = cfg.side === 'right' ? -1 : 1;
-    const tiltRad = (cfg.tilt * Math.PI) / 180;
-    const R = tiltRad > 0.0005 ? cfg.rowH / tiltRad : 0;
-    for (let i = 0; i < n; i++) {
-      const el = els[i];
-      if (!el) continue;
-      let d = i - next;
-      if (cfg.loop && n > 1) {
-        d = ((d % n) + n) % n;
-        if (d > n / 2) d -= n;
-      }
-      const dist = Math.abs(d);
-      let x = 0;
-      let y = d * cfg.rowH;
-      let rot = 0;
-      if (R > 0) {
-        const ang = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, d * tiltRad));
-        y = R * Math.sin(ang);
-        x = -mirror * R * (1 - Math.cos(ang)) * cfg.curve;
-        rot = (mirror * ang * 180) / Math.PI;
-      }
-      el.style.transform = `translate(${x.toFixed(2)}px, calc(${y.toFixed(2)}px - 50%)) rotate(${rot.toFixed(3)}deg)`;
-      
-      const rawOpacity = 1 - dist * cfg.fade;
-      const opacityVal = rawOpacity <= 0 ? 0 : Math.max(cfg.minOpacity, rawOpacity);
-      el.style.opacity = String(opacityVal);
-
-      el.style.filter = cfg.blur > 0 ? `blur(${(dist * cfg.blur).toFixed(2)}px)` : 'none';
-      el.style.setProperty('--ow-p', Math.max(0, 1 - Math.min(dist, 1)).toFixed(4));
-    }
+    renderLayout(next);
 
     rafRef.current = settled ? null : requestAnimationFrame(runFrame);
-  }, []);
+  }, [smoothing, renderLayout]);
 
   const startLoop = useCallback(() => {
-    if (rafRef.current != null) {
-      cancelAnimationFrame(rafRef.current);
-    }
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     lastRef.current = performance.now();
     rafRef.current = requestAnimationFrame(runFrame);
   }, [runFrame]);
 
-  const playTick = useCallback(() => {
-    const { soundUrl, soundVolume } = cfgRef.current;
-    if (!soundUrl) return;
-    const now = performance.now();
-    if (now - lastTickRef.current < 70) return;
-    lastTickRef.current = now;
-    if (!audioRef.current || audioUrlRef.current !== soundUrl) {
-      audioRef.current = new Audio(soundUrl);
-      audioRef.current.preload = 'auto';
-      audioUrlRef.current = soundUrl;
-    }
-    const audio = audioRef.current;
-    audio.volume = Math.min(Math.max(soundVolume, 0), 1);
-    audio.currentTime = 0;
-    audio.play()?.catch(() => {});
-  }, []);
-
-  const applyTarget = useCallback(
-    (value, snap) => {
-      const cfg = cfgRef.current;
-      let v = value;
-      const overscroll = cfg.maxOverscroll || 0;
-      if (!cfg.loop) v = Math.min(Math.max(v, -overscroll), Math.max(cfg.count - 1 + overscroll, 0));
-      if (snap) v = Math.round(v);
-      targetRef.current = v;
-      const clampedIdx = Math.min(Math.max(Math.round(v), 0), cfg.count - 1);
-      const idx = ((clampedIdx % cfg.count) + cfg.count) % cfg.count;
-      if (idx !== selectedRef.current) {
-        selectedRef.current = idx;
-        setSelectedIndex(idx);
-        onChangeRef.current?.(idx, cfg.items[idx]);
-        playTick();
-      }
-      startLoop();
-    },
-    [startLoop, playTick]
-  );
-
-  const hasInitializedRef = useRef(false);
-
+  // Handle updates when driven by GSAP / ScrollTrigger
   useEffect(() => {
-    if (controlledIndex !== undefined) {
-      if (!hasInitializedRef.current || controlledIndex !== targetRef.current) {
-        hasInitializedRef.current = true;
-        applyTarget(controlledIndex, false);
-      }
-    }
-  }, [controlledIndex, applyTarget]);
+    if (controlledIndex === undefined) return;
 
-  const handlePointerDown = useCallback(e => {
-    if (!cfgRef.current.draggable) return;
+    targetRef.current = controlledIndex;
+    
+    // Limit instantaneous jumps larger than 1 item so pass-through frames are rendered
+    const diff = controlledIndex - posRef.current;
+    if (Math.abs(diff) > 1) {
+      posRef.current += Math.sign(diff) * 1;
+      startLoop();
+    } else {
+      posRef.current = controlledIndex;
+      renderLayout(controlledIndex);
+    }
+
+    const clampedIdx = Math.min(Math.max(Math.round(controlledIndex), 0), items.length - 1);
+    if (clampedIdx !== selectedRef.current) {
+      selectedRef.current = clampedIdx;
+      setSelectedIndex(clampedIdx);
+      onChangeRef.current?.(clampedIdx, items[clampedIdx]);
+    }
+  }, [controlledIndex, items, renderLayout, startLoop]);
+
+  // Pointer drag controls (only if draggable is true)
+  const applyTarget = useCallback((value, snap) => {
+    let v = value;
+    if (!loop) v = Math.min(Math.max(v, -maxOverscroll), Math.max(items.length - 1 + maxOverscroll, 0));
+    if (snap) v = Math.round(v);
+    targetRef.current = v;
+
+    const clampedIdx = Math.min(Math.max(Math.round(v), 0), items.length - 1);
+    if (clampedIdx !== selectedRef.current) {
+      selectedRef.current = clampedIdx;
+      setSelectedIndex(clampedIdx);
+      onChangeRef.current?.(clampedIdx, items[clampedIdx]);
+    }
+    startLoop();
+  }, [loop, maxOverscroll, items, startLoop]);
+
+  const handlePointerDown = useCallback((e) => {
+    if (!draggable) return;
     dragRef.current = { y: e.clientY, start: targetRef.current, id: e.pointerId };
     dragMovedRef.current = false;
     setIsDragging(true);
-  }, []);
+  }, [draggable]);
 
-  const handlePointerMove = useCallback(
-    e => {
-      const drag = dragRef.current;
-      if (!drag) return;
-      const dy = e.clientY - drag.y;
-      if (!dragMovedRef.current && Math.abs(dy) > 4) {
-        dragMovedRef.current = true;
-        rootRef.current?.setPointerCapture(drag.id);
-      }
-      if (dragMovedRef.current) applyTarget(drag.start - dy / cfgRef.current.rowH, false);
-    },
-    [applyTarget]
-  );
+  const handlePointerMove = useCallback((e) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const dy = e.clientY - drag.y;
+    if (!dragMovedRef.current && Math.abs(dy) > 4) {
+      dragMovedRef.current = true;
+      rootRef.current?.setPointerCapture(drag.id);
+    }
+    if (dragMovedRef.current) applyTarget(drag.start - dy / rowH, false);
+  }, [applyTarget, rowH]);
 
   const handlePointerEnd = useCallback(() => {
     if (!dragRef.current) return;
@@ -224,59 +174,19 @@ const OptionWheel = ({
     if (dragMovedRef.current) applyTarget(targetRef.current, true);
   }, [applyTarget]);
 
-  const handleItemClick = useCallback(
-    index => {
-      if (dragMovedRef.current) return;
-      const cfg = cfgRef.current;
-      const cur = targetRef.current;
-      let d = index - (((cur % cfg.count) + cfg.count) % cfg.count);
-      if (cfg.loop && cfg.count > 1) {
-        if (d > cfg.count / 2) d -= cfg.count;
-        else if (d < -cfg.count / 2) d += cfg.count;
-      }
-      applyTarget(cur + d, true);
-    },
-    [applyTarget]
-  );
-
-  const handleKeyDown = useCallback(
-    e => {
-      if (!draggable) return;
-      let delta = null;
-      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') delta = -1;
-      else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') delta = 1;
-      if (delta == null) return;
-      e.preventDefault();
-      applyTarget(Math.round(targetRef.current) + delta, true);
-    },
-    [applyTarget, draggable]
-  );
-
   useEffect(() => {
-    if (controlledIndex === undefined) {
-      applyTarget(targetRef.current, false);
-    }
-  }, [items, fontSize, spacing, curve, tilt, blur, fade, minOpacity, side, loop, smoothing, maxOverscroll, applyTarget, controlledIndex]);
-
-  useEffect(
-    () => () => {
+    return () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-      audioRef.current?.pause();
-    },
-    []
-  );
+    };
+  }, []);
 
   return (
     <div
       ref={rootRef}
       role="listbox"
-      tabIndex={0}
       aria-label="Option wheel"
-      className={`relative h-full w-full select-none overflow-hidden outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${className}`}
+      className={`relative h-full w-full select-none overflow-hidden outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-default'} ${className}`}
       style={{
-        '--ow-text-color': textColor,
-        '--ow-active-color': activeColor,
         '--ow-font-size': `${fontSize}rem`,
         '--ow-inset': `${inset}px`
       }}
@@ -284,27 +194,28 @@ const OptionWheel = ({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
-      onKeyDown={handleKeyDown}
     >
-      {items.map((label, index) => (
-        <div
-          key={`${label}-${index}`}
-          ref={el => {
-            itemRefs.current[index] = el;
-          }}
-          role="option"
-          aria-selected={selectedIndex === index}
-          className={`absolute top-1/2 cursor-pointer whitespace-nowrap leading-none will-change-[transform,opacity,filter] [font-size:var(--ow-font-size)] [color:color-mix(in_srgb,var(--ow-active-color)_calc(var(--ow-p,0)*100%),var(--ow-text-color))] ${
-            side === 'right' ? 'right-[var(--ow-inset)] origin-right' : 'left-[var(--ow-inset)] origin-left'
-          } ${selectedIndex === index ? 'font-medium' : 'font-extralight'}`}
-          onClick={() => {
-            if (!draggable) return;
-            handleItemClick(index);
-          }}
-        >
-          {label}
-        </div>
-      ))}
+      {items.map((label, index) => {
+        const isSelected = selectedIndex === index;
+        return (
+          <div
+            key={`${label}-${index}`}
+            ref={(el) => { itemRefs.current[index] = el; }}
+            role="option"
+            aria-selected={isSelected}
+            className={`absolute top-1/2 whitespace-nowrap leading-none will-change-transform ${
+              side === 'right' ? 'right-[var(--ow-inset)] origin-right' : 'left-[var(--ow-inset)] origin-left'
+            } transition-colors duration-200`}
+            style={{
+              fontSize: 'var(--ow-font-size)',
+              color: isSelected ? activeColor : textColor,
+              fontWeight: isSelected ? 600 : 200,
+            }}
+          >
+            {label}
+          </div>
+        );
+      })}
     </div>
   );
 };

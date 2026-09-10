@@ -22,6 +22,36 @@ export default function App() {
   const [projectId, setProjectId] = useState(null);
 
   useEffect(() => {
+    // Initialize Lenis with velocity clamping to prevent trackpad flick skips
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 0.6, // Softens strong wheel flicks
+      touchMultiplier: 1.2,
+      syncTouch: false,
+    });
+
+    // Keep ScrollTrigger and Lenis in lockstep
+    lenis.on('scroll', ScrollTrigger.update);
+    const updateTicker = (time) => lenis.raf(time * 1000);
+    gsap.ticker.add(updateTicker);
+    gsap.ticker.lagSmoothing(0); // Prevents GSAP from dropping frames when CPU throttles
+
+    const handleResize = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      gsap.ticker.remove(updateTicker);
+      ScrollTrigger.getAll().forEach(t => t.kill());
+      lenis.destroy();
+    };
+  }, []);
+
+  useEffect(() => {
     if (location.hash.startsWith('#project-')) {
       const id = location.hash.replace('#project-', '');
       setProjectId(id);
