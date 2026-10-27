@@ -19,6 +19,7 @@ export default function ProjectPage() {
   const cameraWipeEdgeRef = useRef(null);
   const wheelContainerRef = useRef(null);
   const imageCardRef = useRef(null);
+  const blackFadeRef = useRef(null);
   
   const [activeIndex, setActiveIndex] = useState(0);
   const [wheelScrollIndex, setWheelScrollIndex] = useState(0);
@@ -69,7 +70,7 @@ export default function ProjectPage() {
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: 'top top',
-        end: `+=${galleryProjects.length * 120 + 750}vh`,
+        end: `+=${galleryProjects.length * 120 + 350}vh`,
         pin: true,
         scrub: 1.0, // Responsive, fluid catch-up curve
         anticipatePin: 1,
@@ -116,6 +117,9 @@ export default function ProjectPage() {
             if (galleryShowcaseRef.current) {
               gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, opacity: 0, pointerEvents: 'none' });
             }
+            if (blackFadeRef.current) {
+              gsap.set(blackFadeRef.current, { opacity: 0 });
+            }
           } else {
             // ACT 2 & 3: Smooth Cross-Transition from Wheel Exit directly into Gallery Entrance
             // Phase 2: Wheel glides up and dissolves (0.35 -> 0.40)
@@ -159,6 +163,12 @@ export default function ProjectPage() {
                 opacity: galleryOpacity,
                 pointerEvents: galleryP >= 0.48 && galleryP < 0.76 ? 'auto' : 'none'
               });
+            }
+
+            // Black fade-out transition as gallery concludes (0.78 -> 0.97)
+            if (blackFadeRef.current) {
+              const blackOpacity = Math.min(1, Math.max(0, (galleryP - 0.78) / 0.18));
+              gsap.set(blackFadeRef.current, { opacity: blackOpacity });
             }
           }
         }
@@ -364,6 +374,12 @@ export default function ProjectPage() {
         >
           <ParallaxFloatingDemo progress={galleryProgress} />
         </div>
+
+        {/* Full-screen black fade-out overlay transitioning cleanly into the Skills section */}
+        <div
+          ref={blackFadeRef}
+          className="absolute inset-0 z-30 bg-black pointer-events-none opacity-0 will-change-[opacity]"
+        />
       </div>
 
       {/* Custom Floating Cursor for Project Card */}

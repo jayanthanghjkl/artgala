@@ -1,38 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
-import InfiniteGrid from '../../components/common/InfiniteGrid';
+import React from 'react';
+import InfiniteMenu from '../../components/ui/InfiniteMenu';
+import { projectsList } from '../../data/projects';
 
 /**
- * ProjectsPage component.
- * Renders the projects section using Tailwind CSS over the global background.
- * - Desktop: Transparent backdrop with a backdrop blur overlay revealing the global canvas.
+ * ProjectsPage / WorkPage component.
+ * Features the 3D Sphere/Disc InfiniteMenu from React Bits.
  */
 export default function ProjectsPage() {
-  const [inView, setInView] = useState(true);
-  const sectionRef = useRef(null);
+  const infiniteMenuItems = projectsList
+    .filter(p => p.image) // ensure items with images
+    .map(p => ({
+      image: p.image,
+      link: p.link || p.git || '#',
+      title: p.title,
+      description: p.desc
+    }));
 
   return (
-    // Changed bg-pure-black to bg-transparent so the global canvas can bleed through and blur
     <section 
-      ref={sectionRef} 
       id="projects" 
-      className={`relative flex w-full h-full items-center overflow-hidden bg-black project-section ${inView ? 'in-view' : ''}`}
+      className="relative w-full h-full overflow-hidden bg-black flex items-center justify-center"
     >
-      <div className="absolute inset-0 z-[1] pointer-events-none
-                    bg-[radial-gradient(circle_at_center,rgba(230,0,38,0.22)_0%,transparent_60%)]" />
+      {/* Background Radial Glow */}
+      <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,rgba(230,0,38,0.18)_0%,transparent_70%)]" />
 
-      {/* 
-        This absolute full-bleed div handles the backdrop blur uniformly 
-        over the global background canvas streaming underneath it.
-      */}
-      <div className="absolute inset-0 pointer-events-none z-0"></div>
-
-      {/* Interactive Content Container */}
-      <div className="relative z-10 w-full h-full flex items-center">
-        <div className="w-full h-full mx-auto flex flex-col justify-center">
-          <InfiniteGrid inView={inView} />
-        </div>
+      {/* 3D Infinite Grid Menu */}
+      <div className="relative z-10 w-full h-full">
+        <InfiniteMenu
+          items={infiniteMenuItems}
+          scale={0.95}
+          backgroundColor="transparent"
+        />
       </div>
-
     </section>
   );
 }

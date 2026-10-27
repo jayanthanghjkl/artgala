@@ -1,7 +1,7 @@
-import React from 'react';
 import HeroTransitionWrapper from '../components/layout/HeroTransitionWrapper';
 import ProjectPage from './ProjectPage/ProjectPage';
 import StaggeredGrid from './SkillsPage/staggeredGrid';
+import AchievementsPage from './AchievementsPage/AchievementsPage';
 import Footer25 from '../components/ui/Footer25';
 import { skillsBentoItems, skillsGridImages } from '../data/skills';
 
@@ -14,17 +14,30 @@ export default function Home() {
       {/* Unified Project & Gallery Showcase with single persistent static background */}
       <ProjectPage />
 
-      {/* Skills Section Container */}
-      <div id="skills" className="w-full relative z-20 bg-[#101010]">
+      {/* Cinematic Black Fade Transition Buffer into Skills - compact 2-scroll pace */}
+      <div className="w-full h-[6vh] md:h-[10vh] bg-black relative z-20 pointer-events-none" aria-hidden="true" />
+
+      {/* ========================================================================= */}
+      {/* 1. SKILLS SECTION                                                         */}
+      {/* ========================================================================= */}
+      <section id="skills" className="relative w-full z-20 bg-black">
         <StaggeredGrid 
           images={skillsGridImages} 
           bentoItems={skillsBentoItems} 
           centerText="Skills"
         />
-      </div>
+      </section>
 
-      {/* Contact Section & Footer (Footer25) */}
-      <div id="contact" className="w-full h-screen relative z-20">
+
+      {/* ========================================================================= */}
+      {/* 2. ACHIEVEMENTS / AWARDS SECTION (Screen Height)                           */}
+      {/* ========================================================================= */}
+      <section id="achievements" className="relative w-full h-screen z-20 bg-[#000000] flex flex-col justify-center overflow-hidden">
+        <AchievementsPage />
+      </section>
+
+      {/* Footer Section */}
+      <div id="contact" className="w-full relative z-20">
         <Footer25 />
       </div>
     </>

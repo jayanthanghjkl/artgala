@@ -3,8 +3,17 @@ import { motion, AnimatePresence } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { supabase } from "../../../lib/supabaseClient";
+import GradientWaves from "../GradientWaves";
 
-export default function Footer25() {
+export default function Footer25({
+  horizonColor = "#580d0dff",
+  waveColor = "#97010eff",
+  crestColor = "#c41111ff",
+  speed = 0.35,
+  amplitude = 2.2,
+  relief = 1.2,
+  lightAngle = 120,
+} = {}) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,13 +89,25 @@ export default function Footer25() {
   return (
     <footer className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden bg-black text-[#FAFAFA] font-sans antialiased selection:bg-[#FAFAFA] selection:text-black">
       
-      {/* 1. CONSISTENT RED AMBIENT GLOW BACKDROP */}
-      <div className="absolute inset-0 z-0 bg-black overflow-hidden">
-        {/* Deep Red Radial Glow Blobs */}
-        <div className="absolute -bottom-48 -left-48 w-[600px] h-[600px] rounded-full bg-[#e60026]/20 blur-[150px] pointer-events-none" />
-        <div className="absolute -bottom-48 -right-48 w-[600px] h-[600px] rounded-full bg-[#e60026]/15 blur-[150px] pointer-events-none" />
-        {/* Bottom vertical red fading gradient */}
-        <div className="absolute bottom-0 left-0 w-full h-[50vh] bg-gradient-to-t from-[#e60026]/10 to-transparent pointer-events-none" />
+      {/* GradientWaves Animated Interactive Canvas Backdrop */}
+      <div className="absolute inset-0 z-0 bg-black overflow-hidden pointer-events-auto">
+        <GradientWaves
+          horizonColor={horizonColor}
+          waveColor={waveColor}
+          crestColor={crestColor}
+          backgroundColor="transparent"
+          speed={speed}
+          amplitude={amplitude}
+          relief={relief}
+          brightness={0.75}
+          opacity={0.85}
+          lightAngle={lightAngle}
+          mouseInteraction={true}
+          swellOnClick={true}
+          className="w-full h-full"
+        />
+        {/* Soft top gradient to blend the waves seamlessly with the preceding content */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/20 to-transparent pointer-events-none" />
       </div>
 
       {/* Main Content Container */}

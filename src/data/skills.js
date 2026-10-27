@@ -1,3 +1,90 @@
+export const skillsCategories = [
+  {
+    id: "frontend",
+    title: "Frontend",
+    skills: [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Next.js",
+      "Tailwind",
+      "Bootstrap",
+      "Electron"
+    ]
+  },
+  {
+    id: "animation-3d",
+    title: "Animation & 3D",
+    skills: [
+      "GSAP",
+      "Lenis",
+      "Barba.js",
+      "Three.js",
+      "WebGL",
+      "Blender"
+    ]
+  },
+  {
+    id: "backend",
+    title: "Backend",
+    skills: [
+      "Node.js",
+      "Express.js",
+      "Python",
+      "Java",
+      "PHP",
+      "Netlify"
+    ]
+  },
+  {
+    id: "databases",
+    title: "Databases",
+    skills: [
+      "MySQL",
+      "PostgreSQL",
+      "MongoDB",
+      "Supabase"
+    ]
+  },
+  {
+    id: "devops-tools",
+    title: "DevOps & Tools",
+    skills: [
+      "Docker",
+      "Vercel",
+      "Git",
+      "GitHub",
+      "GitLab",
+      "Cloudflare"
+    ]
+  },
+  {
+    id: "system-security",
+    title: "System & Security",
+    skills: [
+      "Linux",
+      "Bash",
+      "Shell",
+      "OWASP",
+      "Metasploit",
+      "Nmap",
+      "OpenVAS",
+      "Ossec"
+    ]
+  },
+  {
+    id: "design",
+    title: "Design",
+    skills: [
+      "Photoshop",
+      "Canva",
+      "Figma"
+    ]
+  }
+];
+
 export const skillsList = [
   { name: 'Java', iconType: 'Java' },
   { name: 'C', iconType: 'C' },
