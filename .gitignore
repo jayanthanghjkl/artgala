@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 
+# Local agent/tool configs
+.openqodex/
+

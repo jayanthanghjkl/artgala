@@ -1,3 +1,5 @@
+import React from 'react';
+import { motion } from 'framer-motion';
 import HeroTransitionWrapper from '../components/layout/HeroTransitionWrapper';
 import ProjectPage from './ProjectPage/ProjectPage';
 import StaggeredGrid from './SkillsPage/staggeredGrid';
@@ -7,7 +9,12 @@ import { skillsBentoItems, skillsGridImages } from '../data/skills';
 
 export default function Home() {
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+    >
       {/* Master Wrapper for Hero and About transitions */}
       <HeroTransitionWrapper />
 
@@ -40,6 +47,6 @@ export default function Home() {
       <div id="contact" className="w-full relative z-20">
         <Footer25 />
       </div>
-    </>
+    </motion.div>
   );
 }

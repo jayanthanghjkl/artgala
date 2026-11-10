@@ -71,14 +71,16 @@ export default function App() {
   return (
     <Layout>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/work" element={<WorkRoute />} />
-        <Route path="/closet" element={<ClosetPage />} />
-        <Route path="/skills" element={<SkillsPage />} />
-        <Route path="/info" element={<HeroFashion />} />
-        <Route path="/contact" element={<ContactPage />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/work" element={<WorkRoute />} />
+          <Route path="/closet" element={<ClosetPage />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/info" element={<HeroFashion />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Routes>
+      </AnimatePresence>
 
       <AnimatePresence>
         {projectId && (

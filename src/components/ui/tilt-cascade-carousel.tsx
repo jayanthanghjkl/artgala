@@ -54,6 +54,8 @@ export type TiltCascadeCarouselProps = {
   captions?: boolean
   /** The prev / dots / next pill. */
   controls?: boolean
+  /** Whether to play an introductory cascade scroll animation on mount. */
+  introAnimation?: boolean
   /** Root background, any CSS colour or gradient. */
   background?: string
   /** Text, dots and buttons. Defaults to the theme's foreground. */
@@ -143,7 +145,7 @@ export function targetFor(i: number, target: number, n: number, loop: boolean): 
 
 const CSS =
   ".tcc-root{position:relative;overflow:hidden;display:grid;place-items:center;width:100%;" +
-  "color:var(--color-foreground,#262626);user-select:none;-webkit-user-select:none;touch-action:pan-y;" +
+  "color:var(--color-foreground,#262626);user-select:none;-webkit-user-select:none;touch-action:none;" +
   "outline:none;-webkit-tap-highlight-color:transparent}" +
   ".tcc-root:focus-visible{box-shadow:inset 0 0 0 2px var(--color-primary,#171717)}" +
   ".tcc-root[data-dragging]{cursor:grabbing}" +
@@ -228,6 +230,7 @@ export default function TiltCascadeCarousel({
   onSelect,
   ariaLabel = "Photo carousel",
   className = "",
+  introAnimation = true,
 }: TiltCascadeCarouselProps) {
   const n = items.length
   const start = Math.min(Math.max(Math.round(index ?? defaultIndex), 0), Math.max(n - 1, 0))
@@ -240,13 +243,27 @@ export default function TiltCascadeCarousel({
   const rootRef = React.useRef(null as HTMLDivElement | null)
   const stageRef = React.useRef(null as HTMLDivElement | null)
   const slideRefs = React.useRef([] as (HTMLButtonElement | null)[])
+  const introKicked = React.useRef(false)
+
+  // Initial offset so cards cascade in smoothly upon entering page
+  const initialOffset = introAnimation ? -2.6 : 0
 
   // Everything the frame loop reads, kept off React state so a frame costs no render.
   const E = React.useRef({
-    a: start, va: 0, b: start, vb: 0, target: start,
-    raf: 0, last: 0, size: 300, reduced: false,
-    drag: null as null | { id: number; x0: number; pos0: number; moved: boolean; samples: { t: number; x: number }[] },
-    clickBlock: false, wheel: 0, wheelAt: 0, stepAt: 0,
+    a: start + initialOffset,
+    va: 0,
+    b: start + initialOffset - 0.4,
+    vb: 0,
+    target: start,
+    raf: 0,
+    last: 0,
+    size: 300,
+    reduced: false,
+    drag: null as null | { id: number; x0: number; y0: number; pos0: number; moved: boolean; samples: { t: number; x: number; y: number }[] },
+    clickBlock: false,
+    wheel: 0,
+    wheelAt: 0,
+    stepAt: 0,
   }).current
   const cfg = React.useRef({ n, loop, angle, drop, inactiveScale, bounce, duration })
   cfg.current = { n, loop, angle, drop, inactiveScale, bounce, duration }
@@ -377,6 +394,18 @@ export default function TiltCascadeCarousel({
     document.head.appendChild(link)
   }, [fontHref])
 
+  // Entrance cascade animation on mount
+  React.useEffect(() => {
+    if (introAnimation && !E.reduced && !introKicked.current) {
+      introKicked.current = true
+      // Kick spring animation so cards cascade into place smoothly
+      const t = window.setTimeout(() => {
+        kick()
+      }, 40)
+      return () => window.clearTimeout(t)
+    }
+  }, [introAnimation])
+
   // Follow scroll action (mouse wheel and trackpad, both vertical and horizontal)
   React.useEffect(() => {
     const el = rootRef.current
@@ -386,16 +415,25 @@ export default function TiltCascadeCarousel({
       if (target?.closest("[data-scroll-ignore]")) return
 
       const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX
-      if (Math.abs(delta) < 1.5) return
+      if (Math.abs(delta) < 1.0) return
 
-      e.preventDefault()
+      if (e.cancelable) {
+        e.preventDefault()
+      }
+
       const now = performance.now()
-      if (now - E.wheelAt > 150) E.wheel = 0
+      if (now - E.wheelAt > 180) {
+        E.wheel = 0
+      }
       E.wheelAt = now
       E.wheel += delta
 
-      // Responsive threshold so card movement follows scroll smoothly and responsively
-      if (Math.abs(E.wheel) >= 28 && now - E.stepAt > 100) {
+      // Fast/notched wheel (single notch is typically >= 35): step with quick response
+      const isNotch = Math.abs(delta) >= 35
+      const threshold = isNotch ? 28 : 20
+      const minInterval = isNotch ? 60 : 75
+
+      if (Math.abs(E.wheel) >= threshold && now - E.stepAt > minInterval) {
         setStopped(true)
         step(Math.sign(E.wheel))
         E.wheel = 0
@@ -437,16 +475,26 @@ export default function TiltCascadeCarousel({
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0 || !n) return
     if ((e.target as Element).closest("[data-tcc-controls]")) return
-    E.drag = { id: e.pointerId, x0: e.clientX, pos0: E.a, moved: false, samples: [{ t: e.timeStamp, x: e.clientX }] }
+    E.drag = {
+      id: e.pointerId,
+      x0: e.clientX,
+      y0: e.clientY,
+      pos0: E.a,
+      moved: false,
+      samples: [{ t: e.timeStamp, x: e.clientX, y: e.clientY }],
+    }
   }
   const onPointerMove = (e: React.PointerEvent) => {
     const d = E.drag
     if (!d || d.id !== e.pointerId) return
     const dx = e.clientX - d.x0
+    const dy = e.clientY - d.y0
+    const combined = dx + dy * 0.7
     if (!d.moved) {
-      if (Math.abs(dx) < 6) return
+      if (Math.hypot(dx, dy) < 6) return
       d.moved = true
       d.x0 = e.clientX
+      d.y0 = e.clientY
       d.pos0 = E.a
       E.va = 0
       rootRef.current?.setPointerCapture(e.pointerId)
@@ -454,9 +502,9 @@ export default function TiltCascadeCarousel({
       setStopped(true)
     }
     const c = cfg.current
-    const raw = d.pos0 - (e.clientX - d.x0) / E.size
+    const raw = d.pos0 - combined / E.size
     E.a = c.loop ? raw : rubber(raw, c.n)
-    d.samples.push({ t: e.timeStamp, x: e.clientX })
+    d.samples.push({ t: e.timeStamp, x: e.clientX, y: e.clientY })
     if (d.samples.length > 6) d.samples.shift()
     const i = indexAt(E.a, c.n, c.loop)
     if (i !== cb.current.active) {
@@ -478,8 +526,9 @@ export default function TiltCascadeCarousel({
     const first = d.samples[0]
     const last = d.samples[d.samples.length - 1]
     const ms = Math.max(last.t - first.t, 1)
+    const dDist = (last.x - first.x) + (last.y - first.y) * 0.7
     // px per ms → slides per second, against the drag direction
-    const v = e.type === "pointercancel" ? 0 : (-(last.x - first.x) / ms / E.size) * 1000
+    const v = e.type === "pointercancel" ? 0 : (-dDist / ms / E.size) * 1000
     E.va = v
     setTarget(releaseTarget(E.a, v, cfg.current.n, cfg.current.loop))
   }

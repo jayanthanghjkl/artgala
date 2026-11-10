@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import Navbar from '../../components/navigation/Navbar';
 import LiquidEther from '../../components/effects/LiquidEther';
+import { THEME_COLORS } from '../../lib/colors';
 
 // ── THREE.JS CAMERA AND PARALLAX CONFIGURATION ─────────────────────────────
 const CAMERA_BASE_POS = [0, 0.4, 14]; // Starting camera position [X, Y, Z]
@@ -152,7 +153,7 @@ export default function HeroSection({ isEntered, children }) {
         {/* Liquid Ether Background */}
         <div className="absolute inset-0 z-[0]">
           <LiquidEther
-            colors={['#e60026', '#ff0033', '#33000b']}
+            colors={[THEME_COLORS.vividCrimson, THEME_COLORS.crimsonBright, THEME_COLORS.crimsonDeep]}
             mouseForce={20}
             cursorSize={100}
             isViscous={false}
@@ -161,7 +162,7 @@ export default function HeroSection({ isEntered, children }) {
         </div>
 
         {/* Red theme glow backdrop */}
-        <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,rgba(230,0,38,0.22)_0%,transparent_60%)]" />
+        <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,var(--color-glow-red)_0%,transparent_60%)]" />
 
         {/* WebGL Canvas */}
         <div className="absolute inset-0 z-[2]">
@@ -174,8 +175,8 @@ export default function HeroSection({ isEntered, children }) {
             <directionalLight position={[0, 10, 15]} intensity={2} />
 
             {/* Red rim kicker lights */}
-            <pointLight position={[-10, 5, -10]} intensity={100} distance={100} decay={2} color="#e60026" />
-            <pointLight position={[10, 5, -10]} intensity={100} distance={100} decay={2} color="#e60026" />
+            <pointLight position={[-10, 5, -10]} intensity={100} distance={100} decay={2} color={THEME_COLORS.vividCrimson} />
+            <pointLight position={[10, 5, -10]} intensity={100} distance={100} decay={2} color={THEME_COLORS.vividCrimson} />
 
             <Suspense fallback={null}>
               <HeroModel meshRef={meshRef} />

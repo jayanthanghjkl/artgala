@@ -81,29 +81,32 @@ export default function HeroTransitionWrapper() {
         .to('.about-portrait', { opacity: 1, y: 0, scale: 1, filter: 'blur(0)', duration: 0.5 }, 'aboutReveal')
         .to('.about-text-column', { opacity: 1, y: 0, duration: 0.5 }, 'aboutReveal')
 
-        // --- PHASE 4: Paragraph Highlights ---
-        .add('para1', '+=0.2')
+        // --- PHASE 4: Paragraph Enlarging Animation on Scroll (First Para 1, then Para 2) ---
+        .add('para1', 'aboutReveal+=0.2')
         .to('.about-para-1', { 
           opacity: 1, 
           scale: 1.05, 
           color: '#000000',
           transformOrigin: 'left center',
-          duration: 0.8 
+          duration: 0.8,
+          ease: 'power2.out'
         }, 'para1')
         
-        .add('para2', '+=1.0')
+        .add('para2', '+=0.8')
         .to('.about-para-1', { 
-          opacity: 0.4, 
+          opacity: 0.45, 
           scale: 1, 
           color: '#27272a', // zinc-800
-          duration: 0.8 
+          duration: 0.8,
+          ease: 'power2.out'
         }, 'para2')
         .to('.about-para-2', { 
           opacity: 1, 
           scale: 1.05, 
           color: '#000000',
           transformOrigin: 'left center',
-          duration: 0.8 
+          duration: 0.8,
+          ease: 'power2.out'
         }, 'para2')
         
         // --- TIMELINE PADDING ---
@@ -143,6 +146,12 @@ export default function HeroTransitionWrapper() {
             .about-h2-anim { opacity: 0; transform: translateY(48px); filter: blur(8px); }
             .about-portrait { transform: translateY(40px) scale(0.96); filter: blur(4px); }
             .about-text-column { transform: translateY(24px); }
+            .about-para-1, .about-para-2 {
+              opacity: 0.4;
+              transform: scale(1);
+              transform-origin: left center;
+              transition: color 0.3s ease;
+            }
           `
         }} />
         <AboutPage />

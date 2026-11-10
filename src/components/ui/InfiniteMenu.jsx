@@ -441,6 +441,12 @@ class ArcballControl {
   EPSILON = 0.05;
   IDENTITY_QUAT = quat.create();
 
+  // Intro showcase spin: Revolves the sphere at start with high-velocity shader distortion effects
+  introActive = true;
+  introDuration = 1.8; // seconds
+  introElapsed = 0;
+  introAxis = vec3.fromValues(0.35, 0.92, 0.18);
+
   constructor(canvas, updateCallback, onClick, onHoverChange) {
     this.canvas = canvas;
     this.updateCallback = updateCallback || (() => null);
@@ -460,6 +466,7 @@ class ArcballControl {
     this.totalDragDist = 0;
 
     canvas.addEventListener('pointerdown', e => {
+      this.introActive = false; // User takes over immediately
       vec2.set(this.pointerPos, e.clientX, e.clientY);
       vec2.copy(this.previousPointerPos, this.pointerPos);
       vec2.copy(this.pointerStartPos, this.pointerPos);
@@ -498,6 +505,7 @@ class ArcballControl {
     // Handle vertical and horizontal (sideways trackpad/shift+scroll) scrolling
     const onWheel = e => {
       e.preventDefault();
+      this.introActive = false; // User takes over immediately
       // Normalize wheel delta across browsers / trackpads
       const dx = Math.max(-100, Math.min(100, e.deltaX));
       const dy = Math.max(-100, Math.min(100, e.deltaY));
@@ -520,7 +528,23 @@ class ArcballControl {
       this.wheelActiveTime -= deltaTime;
     }
 
-    if (this.isPointerDown) {
+    if (this.introActive) {
+      this.introElapsed += deltaTime / 1000;
+      const progress = Math.min(1, this.introElapsed / this.introDuration);
+
+      // Smooth deceleration: starts with rapid spin showing shader velocity squish/stretch, then settles
+      const initialSpinSpeed = 0.16;
+      const speedFactor = Math.pow(1 - progress, 2.4);
+      const currentSpeed = initialSpinSpeed * speedFactor;
+
+      if (progress >= 1 || currentSpeed < 0.002) {
+        this.introActive = false;
+        quat.copy(this.pointerRotation, this.IDENTITY_QUAT);
+      } else {
+        const spinAxis = vec3.normalize(vec3.create(), this.introAxis);
+        quat.setAxisAngle(this.pointerRotation, spinAxis, currentSpeed * timeScale);
+      }
+    } else if (this.isPointerDown) {
       const INTENSITY = 0.3 * timeScale;
       const ANGLE_AMPLIFICATION = 5 / timeScale;
 
@@ -938,14 +962,14 @@ class InfiniteGridMenu {
     let damping = 5 / timeScale;
     let cameraTargetZ = 3 * this.scaleFactor;
 
-    const isMoving = this.control.isPointerDown || Math.abs(this.smoothRotationVelocity) > 0.01;
+    const isMoving = this.control.isPointerDown || this.control.introActive || Math.abs(this.smoothRotationVelocity) > 0.01;
 
     if (isMoving !== this.movementActive) {
       this.movementActive = isMoving;
       this.onMovementChange(isMoving);
     }
 
-    if (!this.control.isPointerDown) {
+    if (!this.control.isPointerDown && !this.control.introActive) {
       const nearestVertexIndex = this.#findNearestVertexIndex();
       const itemIndex = nearestVertexIndex % Math.max(1, this.items.length);
       this.onActiveItemChange(itemIndex);

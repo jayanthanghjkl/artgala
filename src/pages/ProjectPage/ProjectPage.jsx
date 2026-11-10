@@ -5,6 +5,7 @@ import OptionWheel from '../../components/effects/OptionWheel';
 import { ParallaxFloatingDemo } from '../../components/ui/parallax-floating-demo';
 import TiltedCard from '../../components/ui/TiltedCard';
 import { projectsList } from '../../data/projects';
+import { THEME_COLORS } from '../../lib/colors';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -260,7 +261,7 @@ export default function ProjectPage() {
               maxOverscroll={5}
               side="left"
               textColor="#404040"
-              activeColor="#e60026"
+              activeColor={THEME_COLORS.vividCrimson}
               curve={1.2}
               tilt={10}
               spacing={1.8}

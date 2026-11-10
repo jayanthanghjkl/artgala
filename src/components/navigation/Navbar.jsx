@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import TextRoll from '../common/TextRoll';
 import StaggeredMenu from './StaggeredMenu';
+import { THEME_COLORS } from '../../lib/colors';
 
 /**
  * Navbar component.
@@ -35,11 +36,16 @@ export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered })
         socialItems={socialItems}
         displaySocials={true}
         displayItemNumbering={true}
-        menuButtonColor="#ffffff"
-        openMenuButtonColor="#000000"
+        menuButtonColor={THEME_COLORS.pureWhite}
+        openMenuButtonColor={THEME_COLORS.pureBlack}
         changeMenuColorOnOpen={true}
-        colors={['#1a0507', '#4a080e', '#8a0d17', '#e60026']}
-        accentColor="#e60026"
+        colors={[
+          THEME_COLORS.crimsonWineDark,
+          THEME_COLORS.crimsonWineDeep,
+          THEME_COLORS.crimsonRuby,
+          THEME_COLORS.vividCrimson,
+        ]}
+        accentColor={THEME_COLORS.vividCrimson}
         logoUrl=""
         isFixed={false}
       />

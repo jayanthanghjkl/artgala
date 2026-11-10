@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
+import { THEME_COLORS } from '../../lib/colors';
 
 const HoverHighlightText = ({
   radius = 10,
@@ -57,8 +58,8 @@ const HoverHighlightText = ({
 
         if (dist < radius) {
           gsap.to(c, {
-            backgroundColor: '#e60026', // vivid crimson
-            color: '#ffffff', // white text
+            backgroundColor: THEME_COLORS.vividCrimson,
+            color: THEME_COLORS.pureWhite,
             duration: 0,
             overwrite: true
           });

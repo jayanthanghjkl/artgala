@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { THEME_COLORS } from '../../lib/colors';
 
 /**
  * Helper to calculate squared distance from point (px, py) to line segment (ax, ay) -> (bx, by).
@@ -291,11 +292,11 @@ export default function AsciiHands({ opacity = 0.2 }) {
         gradX, gradY, 0,
         gradX, gradY, Math.max(width, height) * 0.7
       );
-      gradient.addColorStop(0, '#ffffff');      // Bright spark core
-      gradient.addColorStop(0.12, '#ff6e8a');    // Neon light pinkish-red
-      gradient.addColorStop(0.35, '#e60026');    // Vivid crimson portfolio theme
-      gradient.addColorStop(0.65, '#5c0010');    // Dark burgundy shadow
-      gradient.addColorStop(1.0, '#000000');     // Faded out dark edge
+      gradient.addColorStop(0, THEME_COLORS.pureWhite);      // Bright spark core
+      gradient.addColorStop(0.12, '#ff6e8a');                 // Neon light pinkish-red
+      gradient.addColorStop(0.35, THEME_COLORS.vividCrimson); // Vivid crimson portfolio theme
+      gradient.addColorStop(0.65, THEME_COLORS.crimsonDeep);  // Dark burgundy shadow
+      gradient.addColorStop(1.0, THEME_COLORS.pureBlack);     // Faded out dark edge
 
       ctx.fillStyle = gradient;
       ctx.font = `${fontSize}px Courier New, Courier, monospace`;

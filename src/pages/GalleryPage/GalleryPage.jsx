@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { ParallaxFloatingDemo } from '../../components/ui/parallax-floating-demo';
+import { THEME_COLORS } from '../../lib/colors';
 
 export default function GalleryPage() {
   const cameraWipeRef = useRef(null);
@@ -31,7 +32,7 @@ export default function GalleryPage() {
         <div
           className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent pointer-events-none z-40 opacity-0 -translate-y-1/2"
           style={{
-            boxShadow: '0 0 20px #ff1a40, 0 0 45px #e60026, 0 0 80px rgba(230,0,38,0.8)'
+            boxShadow: `0 0 20px ${THEME_COLORS.crimsonBright}, 0 0 45px ${THEME_COLORS.vividCrimson}, 0 0 80px ${THEME_COLORS.glowRedStrong}`
           }}
         />
       </div>

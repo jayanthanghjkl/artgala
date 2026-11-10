@@ -1,6 +1,7 @@
 import React from 'react';
 import FlowingMenu from '../../components/ui/FlowingMenu';
 import { achievementsList } from '../../data/atchivemenet';
+import { THEME_COLORS } from '../../lib/colors';
 
 export default function AchievementsPage() {
   return (
@@ -13,10 +14,10 @@ export default function AchievementsPage() {
           <FlowingMenu
             items={achievementsList}
             speed={15}
-            textColor="#ffffffff"
+            textColor={THEME_COLORS.pureWhite}
             bgColor="transparent"
-            marqueeBgColor="#e60026"
-            marqueeTextColor="#ffffff"
+            marqueeBgColor={THEME_COLORS.vividCrimson}
+            marqueeTextColor={THEME_COLORS.pureWhite}
             borderColor="rgba(255, 255, 255, 0.1)"
           />
         </div>
