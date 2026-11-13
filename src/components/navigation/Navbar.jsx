@@ -1,14 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import TextRoll from '../common/TextRoll';
 import StaggeredMenu from './StaggeredMenu';
 import { THEME_COLORS } from '../../lib/colors';
 
 /**
- * Navbar component.
- * Renders the top navigation bar using Tailwind CSS.
- * - Floating glassmorphic dock anchored when entered.
- * - Staggered text roll hover transitions for links.
+ * Navbar component with StaggeredMenu.
  */
 export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered }) {
   const menuItems = [
@@ -26,9 +21,8 @@ export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered })
 
   return (
     <header
-      className={`hero-navbar absolute top-0 left-0 w-full h-full z-50 transition-all duration-1000 ease-out pointer-events-none ${
-        isEntered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-      }`}
+      className={`hero-navbar absolute top-0 left-0 w-full h-full z-50 transition-all duration-1000 ease-out pointer-events-none ${isEntered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        }`}
     >
       <StaggeredMenu
         position="right"

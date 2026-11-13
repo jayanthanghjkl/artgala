@@ -20,9 +20,81 @@
   --color-glow-red: rgba(230, 0, 38, 0.22);
 }
 
+/* Custom Typography Fonts */
+@font-face {
+  font-family: 'Behind The Nineties';
+  src: url('/fonts/Behind-The-Nineties-It.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Behind The Nineties';
+  src: url('/fonts/Behind-The-Nineties-Md-It.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Behind The Nineties';
+  src: url('/fonts/Behind-The-Nineties-Bd-It.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Behind The Nineties';
+  src: url('/fonts/Behind-The-Nineties-Rg.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Behind The Nineties Italic';
+  src: url('/fonts/Behind-The-Nineties-It.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GGX89 Extra Light';
+  src: local('GGX89 Extra Light'), 
+       local('GGX89-ExtraLight'), 
+       local('GGX89ExtraLight'), 
+       local('Ggx89 Extra Light'), 
+       local('Ggx89-ExtraLight'), 
+       local('GGX89'), 
+       local('Ggx89');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ggx89';
+  src: local('GGX89 Extra Light'), 
+       local('GGX89-ExtraLight'), 
+       local('GGX89ExtraLight'), 
+       local('Ggx89 Extra Light'), 
+       local('Ggx89-ExtraLight'), 
+       local('GGX89'), 
+       local('Ggx89');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-editorial: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-behind-nineties: 'Behind The Nineties Italic', 'Behind The Nineties', 'Instrument Serif', Georgia, serif;
+  --font-ggx89: 'GGX89 Extra Light', 'Ggx89', 'GGX89', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
 
   --color-pure-black: #000000;
   --color-obsidian-black: #070707;

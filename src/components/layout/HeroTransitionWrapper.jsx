@@ -31,6 +31,7 @@ export default function HeroTransitionWrapper() {
         // --- PHASE 1: Center Text & Blur ---
         .add('centerText')
         .to('.hero-text-container', { y: '-39vh', duration: 1, ease: 'power2.inOut' }, 'centerText')
+        .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 'centerText')
         .to('.hero-blur-overlay', { opacity: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-blackout-gradient', { scale: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
         // Fade out the description wrapper and navbar right as the text reaches the center
@@ -118,7 +119,7 @@ export default function HeroTransitionWrapper() {
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-screen relative overflow-hidden bg-black">
+    <div ref={containerRef} className="w-full h-screen relative overflow-hidden bg-[#070103]">
       
       {/* Layer 1: Hero Section (Contains 3D Canvas, Expanding Frame, and Text) */}
       <div className="absolute inset-0 z-10 w-full h-full">
