@@ -25,8 +25,8 @@ function HeroModel({ meshRef }) {
     <primitive
       ref={meshRef}
       object={gltf.scene}
-      position={[0, -0.6, 0]}
-      scale={[9, 9, 9]}
+      position={[0, -0.3, 0]}
+      scale={[8.50, 8.5, 8.5]}
     />
   );
 }
@@ -144,11 +144,11 @@ export default function HeroSection({ isEntered, children }) {
     <section
       ref={sectionRef}
       id="hero"
-      className={`relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-black transition-all duration-300 ${isHeroActive ? 'hero-view-active' : ''
+      className={`relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#070103] transition-all duration-300 ${isHeroActive ? 'hero-view-active' : ''
         }`}
     >
 
-      {/* 1. THREE.JS 3D CANVAS BACKGROUND LAYER */}
+      {/* 1. THREE.JS 3D CANVAS & ATMOSPHERIC EDITORIAL BACKGROUND LAYERS */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Liquid Ether Background */}
         <div className="absolute inset-0 z-[0]">
@@ -161,22 +161,40 @@ export default function HeroSection({ isEntered, children }) {
           />
         </div>
 
-        {/* Red theme glow backdrop */}
-        <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,var(--color-glow-red)_0%,transparent_60%)]" />
+        {/* Soft glowing red radial light backdrop emanating from behind the head */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 65% 55% at 50% 39%, rgba(195, 18, 35, 0.52) 0%, rgba(125, 10, 22, 0.30) 34%, rgba(35, 3, 7, 0.82) 62%, #070103 100%)',
+          }}
+        />
 
-        {/* WebGL Canvas */}
-        <div className="absolute inset-0 z-[2]">
+        {/* Subtle, fine-grain film noise overlay matching editorial aesthetic */}
+        <div
+          className="absolute inset-0 z-[2] pointer-events-none opacity-[0.045] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat',
+          }}
+        />
+
+        {/* WebGL Canvas with chiaroscuro lighting */}
+        <div className="absolute inset-0 z-[3]">
           <Canvas
-            camera={{ position: CAMERA_BASE_POS, fov: 40 }}
+            camera={{ position: CAMERA_BASE_POS, fov: 38 }}
             style={{ pointerEvents: 'none' }}
-            gl={{ alpha: true, antialias: true }}
+            gl={{ alpha: true, antialias: true ,toneMapping: THREE.ACESFilmicToneMapping,
+    toneMappingExposure: 1.05,}}
           >
-            <ambientLight intensity={1} />
-            <directionalLight position={[0, 10, 15]} intensity={2} />
+            {/* Chiaroscuro shading: dark warm ambient + strong right directional light */}
+            <ambientLight intensity={0.4} color="#24070c" />
+            <directionalLight position={[12, 7, 12]} intensity={2.6} color="#fff4eb" />
+            <directionalLight position={[6, -2, 6]} intensity={0.5} color="#e8c89b" />
 
             {/* Red rim kicker lights */}
-            <pointLight position={[-10, 5, -10]} intensity={100} distance={100} decay={2} color={THEME_COLORS.vividCrimson} />
-            <pointLight position={[10, 5, -10]} intensity={100} distance={100} decay={2} color={THEME_COLORS.vividCrimson} />
+            <pointLight position={[-12, 4, -8]} intensity={80} distance={40} decay={2} color="#c81428" />
+            <pointLight position={[12, 6, -8]} intensity={40} distance={40} decay={2} color="#9e0c1b" />
 
             <Suspense fallback={null}>
               <HeroModel meshRef={meshRef} />
@@ -193,11 +211,11 @@ export default function HeroSection({ isEntered, children }) {
       <style dangerouslySetInnerHTML={{
         __html: `
         @keyframes heroTitleReveal {
-          from { transform: translateY(105%) scaleY(1.1); opacity: 0; }
+          from { transform: translateY(105%) scaleY(1.05); opacity: 0; }
           to   { transform: translateY(0) scaleY(1); opacity: 1; }
         }
         @keyframes heroDescReveal {
-          from { transform: translateY(30px); opacity: 0; filter: blur(2px); }
+          from { transform: translateY(20px); opacity: 0; filter: blur(3px); }
           to   { transform: translateY(0); opacity: 1; filter: blur(0); }
         }
         
@@ -209,10 +227,10 @@ export default function HeroSection({ isEntered, children }) {
 
         /* Active CSS System: Only plays staggers when page container is actively in view */
         .hero-view-active .hero-title-anim-1 {
-          animation: heroTitleReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+          animation: heroTitleReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
         }
         .hero-view-active .hero-title-anim-2 {
-          animation: heroTitleReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+          animation: heroTitleReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
         }
         .hero-view-active .hero-desc-anim {
           animation: heroDescReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
@@ -232,43 +250,70 @@ export default function HeroSection({ isEntered, children }) {
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
         <div
-          className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[300px] flex items-center justify-center overflow-hidden"
+          className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[200px] flex items-center justify-center overflow-hidden"
           style={{ transform: 'scale(0)' }}
         >
           {children}
         </div>
       </div>
 
-      {/* HERO VIEW CONTENT (Unified for Mobile and Desktop) */}
-      <div className="flex-1 relative z-30 w-full flex items-end px-3 pb-6 md:pb-13 pt-24 translate-y-0 transition-all duration-1000">
+      {/* Top Left: Subtitle description */}
+      <div className="absolute top-8 sm:top-10 md:top-8 left-6 sm:left-8 md:left-9 hero-desc-wrapper overflow-hidden z-30 pointer-events-auto">
+        <p
+          className="hero-desc-anim font-sans text-[12px] sm:text-[13px] md:text-[16px] text-white/70 leading-[1.62] tracking-[0.03em] font-normal max-w-[340px]"
+          style={{
+            textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.76)',
+          }}
+        >
+          Building digital experiences<br />
+          that blend intuitive design with clean<br />
+          scalable code
+        </p>
+      </div>
 
-        <div className="absolute top-15 left-4 md:left-16 hero-desc-wrapper overflow-hidden z-20">
-          <p className="hero-desc-anim font-body text-md md:text-xl text-pure-white/60 leading-relaxed tracking-tight max-w-[280px] md:max-w-[480px]">
-            Building digital experiences <br />
-            that blend intuitive design with clean <br />
-            scalable code
-          </p>
-        </div>
+      {/* HERO VIEW CONTENT: Full screen width typography with GGX89 Extra Light for Jayanthan and Behind The Nineties Italic for Sathiyapal */}
+      <div className="flex-1 relative z-30 w-full flex items-end justify-center px-2 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-5 md:pb-6 lg:pb-8 pt-24 translate-y-0">
+        {/* Dark shadow backdrop gradient behind text for maximum contrast & visibility — strictly scoped to resting home hero */}
+        <div
+          className="hero-text-shadow-bg absolute inset-x-0 bottom-0 h-44 sm:h-56 md:h-64 pointer-events-none z-0 transition-opacity duration-500"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(5, 1, 3, 0.7) 45%, rgba(7, 1, 3, 0.25) 75%, transparent 100%)',
+          }}
+        />
 
         <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start">
           <h1
-            className="font-heading font-black leading-[0.85] tracking-[-0.04em] text-pure-white w-full select-none overflow-hidden whitespace-nowrap flex items-center justify-center"
-            style={{ fontSize: 'clamp(2rem, 8vw, 11rem)' }}
+            className="w-full text-center whitespace-nowrap select-none overflow-hidden flex items-baseline justify-center tracking-[-0.02em] leading-[0.88] text-[#F4F1EA]"
+            style={{
+              fontSize: 'clamp(2.4rem, 11.5vw, 22rem)',
+              textShadow:
+                '0 4px 20px rgba(0, 0, 0, 0.98), 0 10px 40px rgba(0, 0, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.95)',
+              filter: 'drop-shadow(0 8px 24px rgba(0, 0, 0, 0.9))',
+            }}
           >
-            <span className="hero-name-left flex-1 flex justify-end pr-3 md:pr-5">
-              <span className="hero-title-anim-1">JAYANTHAN</span>
+            <span
+              className="hero-name-left flex-1 flex justify-end pr-2 sm:pr-3 md:pr-4 font-extralight"
+              style={{
+                fontFamily: "'GGX89 Extra Light', 'Ggx89', 'GGX89', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif",
+                fontWeight: 400,
+                letterSpacing: '-0.034em',
+              }}
+            >
+              <span className="hero-title-anim-1">Jayanthan</span>
             </span>
-            <span className="hero-name-right flex-1 flex justify-start pl-3 md:pl-5">
-              <span className="hero-title-anim-2">SATHIYAPAL</span>
+            <span
+              className="hero-name-right flex-1 flex justify-start pl-2 sm:pl-3 md:pl-7 italic font-normal"
+              style={{
+                fontFamily: "'Behind The Nineties Italic', 'Behind The Nineties', 'Instrument Serif', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 200,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              <span className="hero-title-anim-2">Sathiyapal.</span>
             </span>
           </h1>
-        </div>
-
-        {/* Mobile Scroll Indicator */}
-        <div className="hero-desc-anim absolute bottom-4 right-6 z-20 flex flex-col items-center gap-2 pointer-events-none select-none">
-          <div className="w-4 h-7 rounded-full border border-pure-white/20 flex justify-center p-0.5">
-            <div className="w-0.5 h-1.5 bg-vivid-crimson rounded-full animate-bounce"></div>
-          </div>
         </div>
       </div>
 

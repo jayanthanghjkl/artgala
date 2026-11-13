@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
@@ -122,9 +123,10 @@ export default function Footer25({
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-4"
           >
-            <a href="#about" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">About</a>
-            <a href="#skills" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Skills</a>
-            <a href="#projects" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Projects</a>
+            <Link to="/work" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Work</Link>
+            <Link to="/closet" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Closet</Link>
+            <Link to="/info" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Info</Link>
+            <Link to="/contact" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Contact</Link>
           </motion.div>
 
           <motion.div
