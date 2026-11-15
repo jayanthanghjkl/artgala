@@ -6,13 +6,13 @@ export const achievementsList = [
   },
   {
     link: '#',
-    text: 'Google Cloud Certified Associate',
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop'
+    text: 'Internship Opportunity at Techjose',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop'
   },
   {
     link: '#',
-    text: '1st Place Web3 Hackathon 2024',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
+    text: '100 Days Web Development Bootcamp - Webzenith',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop'
   },
   {
     link: '#',

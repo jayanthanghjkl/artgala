@@ -100,7 +100,7 @@ export default function HomePage({
               initial={{ opacity: 0, scale: 0.93, y: 35 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-2xl overflow-hidden shadow-2xl group cursor-pointer"
+              className="relative rounded-[5px] overflow-hidden shadow-2xl group cursor-pointer"
             >
               <motion.img
                 src={currentImage}
@@ -108,9 +108,9 @@ export default function HomePage({
                 onError={() => setCurrentImage(fallbackImageUrl)}
                 whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="rounded-2xl object-cover filter brightness-105 transition-all duration-500 w-auto max-w-full max-h-[55vh] md:max-h-[70vh] lg:max-h-[76vh] aspect-[3/4]"
+                className="rounded-[5px] object-cover filter brightness-105 transition-all duration-500 w-auto max-w-full max-h-[55vh] md:max-h-[70vh] lg:max-h-[76vh] aspect-[3/4]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none rounded-[5px]" />
             </motion.div>
           </div>
 

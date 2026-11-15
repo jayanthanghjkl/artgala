@@ -8,7 +8,6 @@ import { THEME_COLORS } from '../../lib/colors';
 export default function Navbar({ mobileMenuOpen, setMobileMenuOpen, isEntered }) {
   const menuItems = [
     { label: 'Work', ariaLabel: 'Go to work', link: '/work' },
-    { label: 'Closet', ariaLabel: 'Go to closet showcase', link: '/closet' },
     { label: 'Info', ariaLabel: 'Go to info / about', link: '/info' },
     { label: 'Contact', ariaLabel: 'Go to contact', link: '/contact' }
   ];

@@ -16,7 +16,7 @@ const ScrollGallery3D = forwardRef(({ items }, ref) => {
           ref={ref}
           bend={3}
           textColor="#F4F1EA"
-          borderRadius={0.05}
+          borderRadius={0}
           scrollSpeed={3}
           scrollEase={0.05}
           items={galleryItems}

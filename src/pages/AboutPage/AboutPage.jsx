@@ -44,7 +44,7 @@ export default function AboutPage() {
         {/* COLUMN LEFT (Span 5): Premium 3D Interactive Tilt Card Portrait */}
         <div className="md:col-span-5 flex justify-center items-center w-full">
           <div
-            className="about-portrait relative rounded-2xl h-[75vh] md:h-[67vh] max-h-[600px] w-full max-w-[420px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] opacity-0 pointer-events-auto"
+            className="about-portrait relative  h-[75vh] md:h-[67vh] max-h-[600px] w-full max-w-[420px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] opacity-0 pointer-events-auto"
             style={{ aspectRatio: '3 / 4' }}
           >
             <InteractiveTiltCard
@@ -54,7 +54,7 @@ export default function AboutPage() {
               }}
               tiltFactor={18}
               hoverScale={1.06}
-              borderRadius={16}
+              borderRadius={5}
               glareEffect={false}
               shadowIntensity={0.35}
               transitionDuration={0.25}

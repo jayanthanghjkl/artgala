@@ -142,121 +142,121 @@ export const ParallaxFloatingDemo = ({ progress = 0, isActive = true }) => {
           easingFactor={0.04} 
           className="w-full h-full overflow-visible"
         >
-          {/* Project 1: Lumina AI (Near plane) */}
+          {/* Project 1: zuzz (1:1 Square) */}
           <FloatingElement depth={0.6} className="top-[6%] left-[8%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 0)}>
-              <a href={`#project-${galleryProjects[0]?.id || 1}`} className="group block relative">
+              <a href={`#project-${galleryProjects[0]?.id || 1}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[0]?.image}
                   alt={galleryProjects[0]?.title || "Project 1"}
                   loading="eager"
                   decoding="async"
-                  className="w-28 h-28 md:w-48 md:h-48 rounded-2xl md:rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-32 md:w-52 aspect-square object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 2: Nexus Platform */}
-          <FloatingElement depth={1.2} className="top-[8%] left-[30%]">
+          {/* Project 2: CornerStone (16:9 Widescreen) */}
+          <FloatingElement depth={1.2} className="top-[8%] left-[28%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 1)}>
-              <a href={`#project-${galleryProjects[1]?.id || 2}`} className="group block relative">
+              <a href={`#project-${galleryProjects[1]?.id || 2}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[1]?.image}
                   alt={galleryProjects[1]?.title || "Project 2"}
                   loading="eager"
                   decoding="async"
-                  className="w-36 h-36 md:w-56 md:h-56 rounded-2xl md:rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-44 md:w-68 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 3: Orbit Engine (Deep depth) */}
-          <FloatingElement depth={2.2} className="top-[2%] left-[55%]">
+          {/* Project 3: artgala (16:9 Widescreen) */}
+          <FloatingElement depth={2.2} className="top-[2%] left-[54%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 2)}>
-              <a href={`#project-${galleryProjects[2]?.id || 3}`} className="group block relative">
+              <a href={`#project-${galleryProjects[2]?.id || 3}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[2]?.image}
                   alt={galleryProjects[2]?.title || "Project 3"}
                   loading="eager"
                   decoding="async"
-                  className="w-44 h-60 md:w-68 md:h-84 rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-48 md:w-76 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 4: SwiftPay */}
-          <FloatingElement depth={1.0} className="top-[2%] left-[80%]">
+          {/* Project 4: taskvault (16:9 Widescreen) */}
+          <FloatingElement depth={1.0} className="top-[2%] left-[78%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 3)}>
-              <a href={`#project-${galleryProjects[3]?.id || 4}`} className="group block relative">
+              <a href={`#project-${galleryProjects[3]?.id || 4}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[3]?.image}
                   alt={galleryProjects[3]?.title || "Project 4"}
                   loading="eager"
                   decoding="async"
-                  className="w-36 h-36 md:w-56 md:h-56 rounded-2xl md:rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-44 md:w-68 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 5: Zenith CRM */}
+          {/* Project 5: SmartGuard LPG (16:9 Widescreen) */}
           <FloatingElement depth={1.4} className="top-[42%] left-[3%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 4)}>
-              <a href={`#project-${galleryProjects[4]?.id || 5}`} className="group block relative">
+              <a href={`#project-${galleryProjects[4]?.id || 5}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[4]?.image}
                   alt={galleryProjects[4]?.title || "Project 5"}
                   loading="eager"
                   decoding="async"
-                  className="w-40 h-40 md:w-64 md:h-64 rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-48 md:w-76 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 6: Aura Workspace */}
-          <FloatingElement depth={2.4} className="top-[60%] left-[72%]">
+          {/* Project 6: nexus (16:9 Widescreen) */}
+          <FloatingElement depth={2.4} className="top-[60%] left-[70%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 5)}>
-              <a href={`#project-${galleryProjects[5]?.id || 6}`} className="group block relative">
+              <a href={`#project-${galleryProjects[5]?.id || 6}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[5]?.image}
                   alt={galleryProjects[5]?.title || "Project 6"}
                   loading="eager"
                   decoding="async"
-                  className="w-44 h-44 md:w-68 md:h-76 rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-44 md:w-68 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 7: Pulse Sync */}
-          <FloatingElement depth={3.8} className="top-[65%] left-[12%]">
+          {/* Project 7: harmonic-waves (16:9 Widescreen) */}
+          <FloatingElement depth={3.8} className="top-[65%] left-[10%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 6)}>
-              <a href={`#project-${galleryProjects[6]?.id || 7}`} className="group block relative">
+              <a href={`#project-${galleryProjects[6]?.id || 7}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[6]?.image}
                   alt={galleryProjects[6]?.title || "Project 7"}
                   loading="eager"
                   decoding="async"
-                  className="w-56 md:w-88 h-44 md:h-68 rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-48 md:w-76 aspect-[16/9] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>
           </FloatingElement>
 
-          {/* Project 8: Nova Shell */}
-          <FloatingElement depth={1.1} className="top-[72%] left-[45%]">
+          {/* Project 8: bloggify (3:2 Aspect Ratio) */}
+          <FloatingElement depth={1.1} className="top-[72%] left-[44%]">
             <div className="floating-card-item" style={getCardStyle(effectiveProgress, 7)}>
-              <a href={`#project-${galleryProjects[7]?.id || 8}`} className="group block relative">
+              <a href={`#project-${galleryProjects[7]?.id || 8}`} className="group block relative overflow-hidden rounded-none border border-white/15 shadow-2xl bg-[#0a0306]">
                 <img
                   src={galleryProjects[7]?.image}
                   alt={galleryProjects[7]?.title || "Project 8"}
                   loading="eager"
                   decoding="async"
-                  className="w-36 h-36 md:w-56 md:h-56 rounded-2xl md:rounded-3xl object-cover border border-white/15 shadow-2xl group-hover:scale-105 duration-300 transition-all"
+                  className="w-44 md:w-68 aspect-[3/2] object-cover group-hover:scale-105 duration-300 transition-all block"
                 />
               </a>
             </div>

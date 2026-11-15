@@ -124,7 +124,6 @@ export default function Footer25({
             className="flex flex-col gap-4"
           >
             <Link to="/work" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Work</Link>
-            <Link to="/closet" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Closet</Link>
             <Link to="/info" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Info</Link>
             <Link to="/contact" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Contact</Link>
           </motion.div>

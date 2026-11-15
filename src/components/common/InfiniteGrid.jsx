@@ -379,7 +379,7 @@ export default function InfiniteGrid({ inView }) {
                       setActiveCardId((prev) => (prev === project.id ? null : project.id));
                     }
                   }}
-                  className="w-full h-full group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/70 backdrop-blur-md shadow-lg transition-all duration-500 ease-out hover:scale-[1.03] hover:border-vivid-crimson/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_25px_rgba(230,0,38,0.18)] select-none"
+                  className="w-full h-full group relative overflow-hidden rounded-none border border-zinc-800 bg-zinc-950/70 backdrop-blur-md shadow-lg transition-all duration-500 ease-out hover:scale-[1.03] hover:border-vivid-crimson/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_25px_rgba(230,0,38,0.18)] select-none"
                 >
                   {/* Front face */}
                   <div

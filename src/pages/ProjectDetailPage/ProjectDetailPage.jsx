@@ -106,7 +106,7 @@ export default function ProjectDetailPage({ projectId }) {
           <div className="w-full h-full flex items-center justify-center order-1 lg:order-2" style={{ perspective: '1000px' }}>
             <div 
               ref={imageContainerRef}
-              className="w-full rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(230,0,38,0.15)] border border-white/10 bg-zinc-900 aspect-[4/3] lg:aspect-auto lg:h-[70vh] transform-gpu"
+              className="w-full rounded-none overflow-hidden shadow-[0_20px_50px_rgba(230,0,38,0.15)] border border-white/10 bg-zinc-900 aspect-[4/3] lg:aspect-auto lg:h-[70vh] transform-gpu"
               style={{ transformStyle: 'preserve-3d' }}
               onMouseMove={(e) => {
                 if (!imageContainerRef.current) return;

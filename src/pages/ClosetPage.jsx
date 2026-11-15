@@ -113,7 +113,7 @@ export default function ClosetPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 20 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-xl bg-zinc-950 border border-white/15 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-6"
+              className="relative w-full max-w-xl bg-zinc-950 border border-white/15 rounded-none overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-6"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -126,7 +126,7 @@ export default function ClosetPage() {
               </button>
 
               {/* Image Preview */}
-              <div className="w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden bg-black/50 border border-white/10 flex-shrink-0">
+              <div className="w-full md:w-1/2 aspect-square rounded-none overflow-hidden bg-black/50 border border-white/10 flex-shrink-0">
                 <img
                   src={selectedItem.src}
                   alt={selectedItem.alt ?? selectedItem.title}

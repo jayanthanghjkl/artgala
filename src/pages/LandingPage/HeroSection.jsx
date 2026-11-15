@@ -161,20 +161,22 @@ export default function HeroSection({ isEntered, children }) {
           />
         </div>
 
-        {/* Soft glowing red radial light backdrop emanating from behind the head */}
+        {/* 1. Soft glowing red radial spotlight backdrop emanating from behind the head */}
         <div
           className="absolute inset-0 z-[1] pointer-events-none"
           style={{
-            background:
-              'radial-gradient(ellipse 65% 55% at 50% 39%, rgba(195, 18, 35, 0.52) 0%, rgba(125, 10, 22, 0.30) 34%, rgba(35, 3, 7, 0.82) 62%, #070103 100%)',
+            background: `
+              radial-gradient(circle at 50% 42%, rgba(220, 20, 38, 0.42) 0%, rgba(165, 12, 26, 0.18) 26%, transparent 52%),
+              radial-gradient(ellipse 68% 58% at 50% 44%, rgba(155, 10, 24, 0.48) 0%, rgba(85, 5, 14, 0.35) 38%, rgba(22, 2, 5, 0.88) 68%, #070103 100%)
+            `,
           }}
         />
 
-        {/* Subtle, fine-grain film noise overlay matching editorial aesthetic */}
+        {/* 2. Subtle, fine-grain film noise overlay matching editorial aesthetic */}
         <div
-          className="absolute inset-0 z-[2] pointer-events-none opacity-[0.045] mix-blend-overlay"
+          className="absolute inset-0 z-[2] pointer-events-none opacity-[0.06] mix-blend-soft-light"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
             backgroundRepeat: 'repeat',
           }}
         />
@@ -282,9 +284,9 @@ export default function HeroSection({ isEntered, children }) {
           }}
         />
 
-        <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start">
+        <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start overflow-visible">
           <h1
-            className="w-full text-center whitespace-nowrap select-none overflow-hidden flex items-baseline justify-center tracking-[-0.02em] leading-[0.88] text-[#F4F1EA]"
+            className="w-full text-center whitespace-nowrap select-none overflow-visible flex items-baseline justify-center tracking-[-0.02em] leading-[0.96] text-[#F4F1EA] pb-3 sm:pb-5 md:pb-0"
             style={{
               fontSize: 'clamp(2.4rem, 11.5vw, 22rem)',
               textShadow:
@@ -293,17 +295,17 @@ export default function HeroSection({ isEntered, children }) {
             }}
           >
             <span
-              className="hero-name-left flex-1 flex justify-end pr-2 sm:pr-3 md:pr-4 font-extralight"
+              className="hero-name-left flex-1 flex justify-end pr-2 sm:pr-3 md:pr-4 font-extralight overflow-visible pb-2 sm:pb-3"
               style={{
                 fontFamily: "'GGX89 Extra Light', 'Ggx89', 'GGX89', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif",
                 fontWeight: 400,
                 letterSpacing: '-0.034em',
               }}
             >
-              <span className="hero-title-anim-1">Jayanthan</span>
+              <span className="hero-title-anim-1 overflow-visible inline-block">Jayanthan</span>
             </span>
             <span
-              className="hero-name-right flex-1 flex justify-start pl-2 sm:pl-3 md:pl-7 italic font-normal"
+              className="hero-name-right flex-1 flex justify-start pl-2 sm:pl-3 md:pl-7 italic font-normal overflow-visible pb-2 sm:pb-3"
               style={{
                 fontFamily: "'Behind The Nineties Italic', 'Behind The Nineties', 'Instrument Serif', Georgia, serif",
                 fontStyle: 'italic',
@@ -311,7 +313,7 @@ export default function HeroSection({ isEntered, children }) {
                 letterSpacing: '-0.02em',
               }}
             >
-              <span className="hero-title-anim-2">Sathiyapal.</span>
+              <span className="hero-title-anim-2 overflow-visible inline-block">Sathiyapal.</span>
             </span>
           </h1>
         </div>

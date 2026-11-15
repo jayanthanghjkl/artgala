@@ -9,9 +9,7 @@ export const skillsCategories = [
       "TypeScript",
       "React",
       "Next.js",
-      "Tailwind",
-      "Bootstrap",
-      "Electron"
+      "Tailwind"
     ]
   },
   {
@@ -20,7 +18,6 @@ export const skillsCategories = [
     skills: [
       "GSAP",
       "Lenis",
-      "Barba.js",
       "Three.js",
       "WebGL",
       "Blender"
@@ -32,10 +29,7 @@ export const skillsCategories = [
     skills: [
       "Node.js",
       "Express.js",
-      "Python",
-      "Java",
-      "PHP",
-      "Netlify"
+      "PHP"
     ]
   },
   {
@@ -52,12 +46,12 @@ export const skillsCategories = [
     id: "devops-tools",
     title: "DevOps & Tools",
     skills: [
-      "Docker",
+      "Turborepo",
+      "CI/CD Pipeline with GitHub Actions",
       "Vercel",
       "Git",
       "GitHub",
-      "GitLab",
-      "Cloudflare"
+      "GitLab"
     ]
   },
   {
@@ -66,12 +60,7 @@ export const skillsCategories = [
     skills: [
       "Linux",
       "Bash",
-      "Shell",
-      "OWASP",
-      "Metasploit",
-      "Nmap",
-      "OpenVAS",
-      "Ossec"
+      "Shell"
     ]
   },
   {
@@ -86,7 +75,6 @@ export const skillsCategories = [
 ];
 
 export const skillsList = [
-  { name: 'Java', iconType: 'Java' },
   { name: 'C', iconType: 'C' },
   { name: 'TypeScript', iconType: 'TypeScript' },
   { name: 'JavaScript', iconType: 'JavaScript' },

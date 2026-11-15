@@ -50,7 +50,7 @@ export const projectsList = [
   },
   {
     id: 6,
-    title: "SmartGuard LPG",
+    title: "SmartGuard",
     desc: "IoT safety monitoring platform and telemetry dashboard built with React, TypeScript, and Supabase to stream real-time gas level diagnostics and hazard alerts.",
     tag: "IoT + Supabase",
     link: "https://github.com/jayanthanghjkl/Smartgaurd-LPG-detector",
@@ -68,7 +68,7 @@ export const projectsList = [
   },
   {
     id: 8,
-    title: "harmonic-waves",
+    title: "harmonicwaves",
     desc: "Fluid algorithmic audio-visual experience and interactive landing system built with Next.js, Framer Motion, and shadcn/ui components.",
     tag: "Framer Motion",
     link: "https://github.com/jayanthanghjkl/harmonic-waves",

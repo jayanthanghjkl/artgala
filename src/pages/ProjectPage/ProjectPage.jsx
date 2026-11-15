@@ -21,7 +21,7 @@ export default function ProjectPage() {
   const wheelContainerRef = useRef(null);
   const imageCardRef = useRef(null);
   const blackFadeRef = useRef(null);
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [wheelScrollIndex, setWheelScrollIndex] = useState(0);
   const [isPinned, setIsPinned] = useState(false);
@@ -39,10 +39,10 @@ export default function ProjectPage() {
 
   useLayoutEffect(() => {
     if (!cursorRef.current) return;
-    
+
     // Set initial centering for the custom cursor
     gsap.set(cursorRef.current, { xPercent: -50, yPercent: -50 });
-    
+
     // Create highly performant GSAP quickTo functions
     const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.4, ease: "power3.out" });
     const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.4, ease: "power3.out" });
@@ -99,7 +99,7 @@ export default function ProjectPage() {
             const normP = p / p1End;
             const targetIndex = normP * maxIndex;
             const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
-            
+
             wheelIndexRef.current = targetIndex;
             setWheelScrollIndex(targetIndex);
 
@@ -126,7 +126,7 @@ export default function ProjectPage() {
             // Phase 2: Wheel glides up and dissolves (0.35 -> 0.40)
             const exitP = Math.min(1, Math.max(0, (p - p1End) / (p2End - p1End)));
             const targetIndex = maxIndex + exitP * 2.5;
-            
+
             wheelIndexRef.current = targetIndex;
             setWheelScrollIndex(targetIndex);
 
@@ -142,7 +142,7 @@ export default function ProjectPage() {
 
             // Gallery progression starts blending in at 0.35
             const galleryP = Math.min(1, Math.max(0, (p - galleryStart) / (1.00 - galleryStart)));
-            
+
             if (Math.abs(galleryP - galleryProgressRef.current) > 0.001) {
               galleryProgressRef.current = galleryP;
               setGalleryProgress(galleryP);
@@ -249,7 +249,7 @@ export default function ProjectPage() {
           className="absolute inset-0 z-10 w-full h-full flex flex-col md:flex-row items-center justify-center will-change-transform"
         >
           {/* LEFT: Option Wheel */}
-          <div 
+          <div
             ref={wheelContainerRef}
             className="w-full md:w-1/2 h-full flex items-center justify-start pointer-events-none relative z-10 px-4 md:px-0"
           >
@@ -271,18 +271,18 @@ export default function ProjectPage() {
           </div>
 
           {/* RIGHT: 3D Flipping Card - The Whole Div Flips from Bottom to Top */}
-          <div 
+          <div
             ref={imageCardRef}
-            className="w-full md:w-1/2 h-full relative z-0 flex items-center justify-center p-4 md:p-8" 
+            className="w-full md:w-1/2 h-full relative z-0 flex items-center justify-center p-4 md:p-6 lg:p-8 overflow-hidden"
             style={{
               perspective: '1200px',
               perspectiveOrigin: 'center center',
               transformStyle: 'preserve-3d'
             }}
           >
-            <div 
+            <div
               ref={imageContainerRef}
-              className="relative w-full max-w-2xl aspect-[4/3] flex items-center justify-center transform-gpu"
+              className="relative w-full max-w-xl lg:max-w-2xl max-h-[72vh] aspect-[16/9] flex items-center justify-center transform-gpu"
               style={{ transformStyle: 'preserve-3d' }}
             >
               {galleryProjects.map((project, idx) => {
@@ -327,7 +327,7 @@ export default function ProjectPage() {
                   <a
                     key={project.id}
                     href={`#project-${project.id}`}
-                    className="absolute inset-0 w-full h-full rounded-2xl overflow-visible block will-change-transform transform-gpu cursor-pointer"
+                    className="absolute inset-0 w-full h-full rounded-none overflow-hidden block will-change-transform transform-gpu cursor-pointer"
                     style={{
                       transform: transformStyle,
                       opacity: opacity,
@@ -346,15 +346,15 @@ export default function ProjectPage() {
                       containerWidth="100%"
                       imageHeight="100%"
                       imageWidth="100%"
-                      rotateAmplitude={14}
-                      scaleOnHover={1.12}
+                      rotateAmplitude={12}
+                      scaleOnHover={1.06}
                       showMobileWarning={false}
                       showTooltip={true}
                       displayOverlayContent={true}
                       overlayContent={
                         <div className="w-full">
                           <p className="tilted-card-demo-text flex items-center justify-between">
-                            <span>{project.title}</span>
+                            
                           </p>
                         </div>
                       }
@@ -384,7 +384,7 @@ export default function ProjectPage() {
       </div>
 
       {/* Custom Floating Cursor for Project Card */}
-      <div 
+      <div
         ref={cursorRef}
         className={`fixed top-0 left-0 pointer-events-none z-[100] flex items-center justify-center transition-all duration-300 ease-out ${isHoveringImage ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
       >

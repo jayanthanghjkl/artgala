@@ -548,7 +548,7 @@ const CircularGallery = forwardRef(({
   items,
   bend = 3,
   textColor = '#ffffff',
-  borderRadius = 0.05,
+  borderRadius = 0,
   font = 'bold 30px Figtree',
   fontUrl,
   scrollSpeed = 2,

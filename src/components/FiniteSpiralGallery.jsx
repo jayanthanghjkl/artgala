@@ -26,7 +26,7 @@ export default function FiniteSpiralGallery({
   basePerspective = 800,
   cardsPerTurn = 15,
   centerScale = 1.3,
-  cardRadius = 12,
+  cardRadius = 0,
   edgeBlur = 2,
   edgeFade = 0.1,
   cardTilt = 0,
@@ -85,13 +85,13 @@ export default function FiniteSpiralGallery({
 
           // Wipe fade into pure dark canvas once covering screen
           const wipeFade = clamp(1 - (zoomProgress - 0.55) / 0.35, 0, 1);
-          const cardRadius = clamp(16 * (1 - zoomProgress * 2.5), 0, 16);
+          const currentRadius = 0;
 
           card.style.transform = `translate(-50%, -50%) translate3d(0px, 0px, ${zTravel}px) scale(${zoomScale})`;
           card.style.opacity = wipeFade.toFixed(3);
           card.style.zIndex = '999';
           card.style.filter = 'none';
-          card.style.borderRadius = `${cardRadius}px`;
+          card.style.borderRadius = '0px';
           card.style.boxShadow = `0 0 ${50 * (1 - zoomProgress)}px rgba(0,0,0,0.85)`;
           card.style.pointerEvents = 'none';
         } else {
