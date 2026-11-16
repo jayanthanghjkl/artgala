@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { InteractiveTiltCard } from '@/components/ui/tilt-card';
 import VariableProximity from '../../components/effects/VariableProximity';
+import ScrollReveal from '../../components/ui/ScrollReveal';
 import { THEME_COLORS } from '../../lib/colors';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -12,14 +13,14 @@ gsap.registerPlugin(ScrollTrigger);
  * Features an asymmetric light-mode editorial portrait spread.
  * Plays premium cinematic staggers smoothly via GSAP ScrollTrigger.
  */
-export default function AboutPage() {
+export default function AboutPage({ progress1, progress2 }) {
   const containerRef = useRef(null);
 
   return (
     <section
       ref={containerRef}
       id="about"
-      className="relative w-full h-full text-zinc-900 px-6 md:px-16 py-12 flex flex-col justify-between overflow-hidden select-none pointer-events-none"
+      className="relative w-full h-full text-zinc-900 px-6 md:px-16 py-4 sm:py-6 lg:py-8 flex flex-col justify-between overflow-hidden select-none pointer-events-none"
     >
 
       {/* ── DESIGN TOP HALF: STRUCTURAL VISUAL ANCHOR ── */}
@@ -60,7 +61,7 @@ export default function AboutPage() {
               transitionDuration={0.25}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
-              <span className="absolute bottom-4 left-4 font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-800 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/40 shadow-sm z-20 pointer-events-none">
+              <span className="absolute bottom-4 left-4 font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-800 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-sm border border-white/40 shadow-sm z-20 pointer-events-none">
                 [ 2028 &mdash; passout ]
               </span>
             </InteractiveTiltCard>
@@ -68,29 +69,61 @@ export default function AboutPage() {
         </div>
 
         {/* COLUMN RIGHT (Span 7): Interlocking Typography Block */}
-        <div className="about-text-column md:col-span-7 flex flex-col gap-8 opacity-0 pointer-events-auto select-text">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-8 bg-vivid-crimson" />
-              <h3 className="text-vivid-crimson font-mono text-sm uppercase tracking-widest font-bold">
-                Biography
-              </h3>
-            </div>
+<div className="about-text-column col-span-full md:col-span-7 flex flex-col gap-6 md:gap-8 opacity-0 pointer-events-auto select-text">
+  <div className="flex flex-col gap-3 md:gap-4">
+    <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="h-px w-6 sm:w-8 bg-vivid-crimson" />
+      <h3 className="text-vivid-crimson font-mono text-xs sm:text-sm uppercase tracking-widest font-bold">
+        Biography
+      </h3>
+    </div>
 
-            {/* Paragraph 1 - Lazy loading from blur to show */}
-            <p className="about-para-1 font-body text-xl md:text-2xl leading-relaxed tracking-wide max-w-2xl text-zinc-900 font-normal">
-              I am a software engineer focused on building high-performance digital experiences.
-              My work lives at the intersection of complex architectural design systems and clean,
-              highly scalable, fluid code implementation.
-            </p>
-          </div>
+    {/* Paragraph 1 - ScrollReveal */}
+    <ScrollReveal
+      as="p"
+      highlightColor={null}
+      mode="scrub"
+      splitBy="words"
+      effect="fade"
+      stagger={0.05}
+      duration={0.8}
+      smoothing={0}
+      baseOpacity={0.1}
+      baseRotation={3}
+      baseOffset={0}
+      enableBlur={true}
+      blurStrength={4}
+      progress={progress1}
+      containerClassName="w-full max-w-2xl"
+      textClassName="font-body text-base sm:text-lg md:text-xl lg:text-2xl leading-normal sm:leading-relaxed tracking-normal sm:tracking-wide text-zinc-900 font-normal"
+    >
+      I am a software engineer focused on building high-performance digital experiences. My work lives at the intersection of complex architectural design systems and clean, highly scalable, fluid code implementation.
+    </ScrollReveal>
+  </div>
 
-          {/* Paragraph 2 - Follows from blur to show */}
-          <p className="about-para-2 font-body text-xl md:text-2xl leading-relaxed tracking-wide max-w-2xl text-zinc-900 font-normal">
-            Driven by design psychology and creative technology, I engineer interactive products
-            that don&rsquo;t just function perfectly under the hood, but feel premium and natural to the end user.
-          </p>
-        </div>
+  {/* Paragraph 2 - ScrollReveal */}
+  <ScrollReveal
+    as="p"
+    highlightColor={null}
+    mode="scrub"
+    splitBy="words"
+    effect="fade"
+    stagger={0.05}
+    duration={0.8}
+    smoothing={0}
+    baseOpacity={0.1}
+    baseRotation={3}
+    baseOffset={0}
+    enableBlur={true}
+    blurStrength={4}
+    progress={progress2}
+    containerClassName="w-full max-w-2xl"
+    textClassName="font-body text-base sm:text-lg md:text-xl lg:text-2xl leading-normal sm:leading-relaxed tracking-normal sm:tracking-wide text-zinc-900 font-normal"
+  >
+    Driven by design psychology and creative technology, I engineer interactive products that don&rsquo;t just function perfectly under the hood, but feel premium and natural to the end user.
+  </ScrollReveal>
+</div>
+
 
       </div>
     </section>

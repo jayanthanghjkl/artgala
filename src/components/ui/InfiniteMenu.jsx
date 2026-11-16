@@ -932,7 +932,7 @@ const InfiniteMenu = ({
           <div className="infinite-menu__custom">{renderInfo(current, active % items.length, moving)}</div>
         ) : (
           <div className="infinite-menu__info" data-moving={moving} data-layout={layout}>
-            {current.title && <h2 className="infinite-menu__title">{current.title}</h2>}
+            {current.title && <h1 className="infinite-menu__title">{current.title}</h1>}
             {current.description && <p className="infinite-menu__description">{current.description}</p>}
             {hasAction &&
               (current.link ? (

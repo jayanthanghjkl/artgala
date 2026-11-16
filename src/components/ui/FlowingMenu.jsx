@@ -228,15 +228,33 @@ function MenuItem({
 
   return (
     <div className="menu__item" ref={itemRef} style={{ borderColor }}>
-      <a
-        className="menu__item-link font-heading"
-        href={link}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        style={{ color: textColor }}
-      >
-        {text}
-      </a>
+      {link && link !== '#' ? (
+        <a
+          className="menu__item-link font-heading"
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{ color: textColor }}
+        >
+          {text}
+        </a>
+      ) : (
+        <div
+          role="presentation"
+          className="menu__item-link font-heading select-none cursor-default"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{ color: textColor }}
+        >
+          {text}
+        </div>
+      )}
       <div className="marquee" ref={marqueeRef} style={{ backgroundColor: marqueeBgColor }}>
         <div className="marquee__inner-wrap">
           <div className="marquee__inner" ref={marqueeInnerRef} aria-hidden="true">

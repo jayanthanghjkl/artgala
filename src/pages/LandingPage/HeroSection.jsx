@@ -244,10 +244,8 @@ export default function HeroSection({ isEntered, children }) {
         }
       `}} />
 
-      {/* Blur overlay for transition (Placed below expanding frame) */}
-      <div className="hero-blur-overlay absolute inset-0 backdrop-blur-md opacity-0 pointer-events-none z-10 flex items-center justify-center overflow-hidden">
-        <div className="hero-blackout-gradient absolute w-[200vw] h-[200vw] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%)', transform: 'scale(0)' }} />
-      </div>
+      {/* Blur & Total Blackout overlay for transition (Placed below expanding frame) */}
+      <div className="hero-blur-overlay absolute inset-0 bg-[#070103] backdrop-blur-md opacity-0 pointer-events-none z-10" />
 
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
@@ -259,10 +257,10 @@ export default function HeroSection({ isEntered, children }) {
         </div>
       </div>
 
-      {/* Top Left: Subtitle description */}
-      <div className="absolute top-8 sm:top-10 md:top-8 left-6 sm:left-8 md:left-9 hero-desc-wrapper overflow-hidden z-30 pointer-events-auto">
+      {/* Top Left: Subtitle description (Desktop >= 768px) */}
+      <div className="hidden md:block absolute md:top-8 md:left-9 hero-desc-wrapper overflow-hidden z-30 pointer-events-auto">
         <p
-          className="hero-desc-anim font-sans text-[12px] sm:text-[13px] md:text-[16px] text-white/70 leading-[1.62] tracking-[0.03em] font-normal max-w-[340px]"
+          className="hero-desc-anim font-sans text-[16px] text-white/70 leading-[1.62] tracking-[0.03em] font-normal max-w-[340px]"
           style={{
             textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.76)',
           }}
@@ -285,6 +283,20 @@ export default function HeroSection({ isEntered, children }) {
         />
 
         <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start overflow-visible">
+          {/* Mobile View (< 768px): Subtitle positioned directly above Jayanthan Sathiyapal */}
+          <div className="block md:hidden w-full px-2 sm:px-3 mb-2 sm:mb-3 hero-desc-wrapper overflow-hidden pointer-events-auto">
+            <p
+              className="hero-desc-anim font-sans text-[12px] sm:text-[13px] text-white/80 leading-[1.5] tracking-[0.03em] font-normal text-left"
+              style={{
+                textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.76)',
+              }}
+            >
+              Building digital experiences<br />
+              that blend intuitive design with clean<br />
+              scalable code
+            </p>
+          </div>
+
           <h1
             className="w-full text-center whitespace-nowrap select-none overflow-visible flex items-baseline justify-center tracking-[-0.02em] leading-[0.96] text-[#F4F1EA] pb-3 sm:pb-5 md:pb-0"
             style={{

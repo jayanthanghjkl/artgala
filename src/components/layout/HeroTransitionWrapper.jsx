@@ -10,6 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 export default function HeroTransitionWrapper() {
   const containerRef = useRef(null);
   const [triggerDecrypt, setTriggerDecrypt] = useState(false);
+  const [paraProgress1, setParaProgress1] = useState(0);
+  const [paraProgress2, setParaProgress2] = useState(0);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -28,18 +30,18 @@ export default function HeroTransitionWrapper() {
       // We start the text centering immediately without waiting for the 3D model to finish zooming.
       tl.add('start')
         
-        // --- PHASE 1: Center Text & Blur ---
+        // --- PHASE 1: Center Text ---
         .add('centerText')
         .to('.hero-text-container', { y: '-39vh', duration: 1, ease: 'power2.inOut' }, 'centerText')
-        .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 'centerText')
-        .to('.hero-blur-overlay', { opacity: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
-        .to('.hero-blackout-gradient', { scale: 1, duration: 1, ease: 'power2.inOut' }, 'centerText')
-        // Fade out the description wrapper and navbar right as the text reaches the center
-        .to('.hero-desc-wrapper', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText+=0.7')
-        .to('.hero-navbar', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText+=0.7')
+        .to('.hero-desc-wrapper', { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'centerText')
+        .to('.hero-navbar', { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'centerText')
+        .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'centerText')
         
-        // --- PHASE 2: Split Text & Expand Frame Simultaneously ---
-        .add('splitAndExpand', '+=0.5')
+        // --- PHASE 1.5: Total Blackout (Once text reaches center, background blacks out completely) ---
+        .to('.hero-blur-overlay', { opacity: 1, duration: 0.6, ease: 'power2.inOut' }, 'centerText+=0.7')
+        
+        // --- PHASE 2: Split Text & Zoom In (Expanding Frame) ---
+        .add('splitAndExpand', 'centerText+=1.4')
         .to('.hero-name-left', { x: '-150vw', duration: 1.5, ease: 'power3.inOut' }, 'splitAndExpand')
         .to('.hero-name-right', { x: '150vw', duration: 1.5, ease: 'power3.inOut' }, 'splitAndExpand')
         .to('.expanding-frame', { 
@@ -48,14 +50,13 @@ export default function HeroTransitionWrapper() {
           duration: 1.5, 
           ease: 'power3.inOut' 
         }, 'splitAndExpand')
-        .to('.hero-blur-overlay', { opacity: 0, duration: 0.5 }, 'splitAndExpand+=1.0')
 
-        // Text fades in fast as expansion starts
+        // --- PHASE 2.2: Text Reveal ---
         .to('.decrypt-text-wrapper', {
           opacity: 1,
           duration: 0.5,
           ease: 'power3.inOut'
-        }, 'splitAndExpand+=0.1')
+        }, 'splitAndExpand+=0.2')
         // Synchronously animate the progress of the decryption strictly tied to expansion
         .to({ val: 0 }, {
           val: 1,
@@ -64,7 +65,7 @@ export default function HeroTransitionWrapper() {
           onUpdate: function() {
             setTriggerDecrypt(this.targets()[0].val);
           }
-        }, 'splitAndExpand')
+        }, 'splitAndExpand+=0.2')
         
         // --- PHASE 2.5: Fade Out Text on "Next Scroll" ---
         // We wait for 1 full duration unit AFTER expansion is done before fading
@@ -82,32 +83,25 @@ export default function HeroTransitionWrapper() {
         .to('.about-portrait', { opacity: 1, y: 0, scale: 1, filter: 'blur(0)', duration: 0.5 }, 'aboutReveal')
         .to('.about-text-column', { opacity: 1, y: 0, duration: 0.5 }, 'aboutReveal')
 
-        // --- PHASE 4: Paragraph Enlarging Animation on Scroll (First Para 1, then Para 2) ---
+        // --- PHASE 4: ScrollReveal Word Scrubbing ---
         .add('para1', 'aboutReveal+=0.2')
-        .to('.about-para-1', { 
-          opacity: 1, 
-          scale: 1.05, 
-          color: '#000000',
-          transformOrigin: 'left center',
-          duration: 0.8,
-          ease: 'power2.out'
+        .to({ val: 0 }, {
+          val: 1,
+          duration: 1.0,
+          ease: 'none',
+          onUpdate: function() {
+            setParaProgress1(this.targets()[0].val);
+          }
         }, 'para1')
         
-        .add('para2', '+=0.8')
-        .to('.about-para-1', { 
-          opacity: 0.45, 
-          scale: 1, 
-          color: '#27272a', // zinc-800
-          duration: 0.8,
-          ease: 'power2.out'
-        }, 'para2')
-        .to('.about-para-2', { 
-          opacity: 1, 
-          scale: 1.05, 
-          color: '#000000',
-          transformOrigin: 'left center',
-          duration: 0.8,
-          ease: 'power2.out'
+        .add('para2', '+=0.3')
+        .to({ val: 0 }, {
+          val: 1,
+          duration: 1.0,
+          ease: 'none',
+          onUpdate: function() {
+            setParaProgress2(this.targets()[0].val);
+          }
         }, 'para2')
         
         // --- TIMELINE PADDING ---
@@ -147,15 +141,9 @@ export default function HeroTransitionWrapper() {
             .about-h2-anim { opacity: 0; transform: translateY(48px); filter: blur(8px); }
             .about-portrait { transform: translateY(40px) scale(0.96); filter: blur(4px); }
             .about-text-column { transform: translateY(24px); }
-            .about-para-1, .about-para-2 {
-              opacity: 0.4;
-              transform: scale(1);
-              transform-origin: left center;
-              transition: color 0.3s ease;
-            }
           `
         }} />
-        <AboutPage />
+        <AboutPage progress1={paraProgress1} progress2={paraProgress2} />
       </div>
 
     </div>

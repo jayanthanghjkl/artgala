@@ -10,6 +10,7 @@ const OptionWheel = ({
   defaultSelected = 0,
   controlledIndex,
   onChange,
+  onItemClick,
   textColor = '#a6a6a6',
   activeColor = '#ffffff',
   side = 'left',
@@ -203,7 +204,11 @@ const OptionWheel = ({
             ref={(el) => { itemRefs.current[index] = el; }}
             role="option"
             aria-selected={isSelected}
-            className={`absolute top-1/2 whitespace-nowrap leading-none will-change-transform ${
+            onClick={() => {
+              if (dragMovedRef.current) return;
+              onItemClick?.(index, label);
+            }}
+            className={`absolute top-1/2 whitespace-nowrap leading-none will-change-transform cursor-pointer pointer-events-auto ${
               side === 'right' ? 'right-[var(--ow-inset)] origin-right' : 'left-[var(--ow-inset)] origin-left'
             } transition-colors duration-200`}
             style={{

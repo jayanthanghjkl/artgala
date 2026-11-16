@@ -20,10 +20,8 @@ export default function WorkRoute() {
         transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         className="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-6 md:px-10 py-5 sm:py-6 md:py-8 pointer-events-none"
       >
-        <div className="w-[88px] hidden sm:block" />
-        
-        <h1 className="font-heading text-xl md:text-2xl font-bold text-white tracking-[0.2em] uppercase drop-shadow-md">
-          Works
+        <h1 className="pointer-events-auto font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight drop-shadow-md">
+          Work
         </h1>
         
         <Link 

@@ -46,8 +46,12 @@ export default function HomePage({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full z-30 flex items-center justify-end px-6 md:px-12 pt-5 md:pt-6 pb-2 shrink-0"
+          className="w-full z-30 flex items-center justify-between px-6 md:px-12 pt-5 md:pt-6 pb-2 shrink-0"
         >
+          <h1 className="font-heading text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-black">
+            Info
+          </h1>
+
           <Link
             to="/"
             className="pointer-events-auto flex items-center gap-2 text-zinc-1000 hover:text-white transition-colors duration-300 font-heading text-xs sm:text-sm font-bold tracking-widest uppercase group/link  px-4 sm:px-5 py-2 sm:py-2.5"

@@ -27,6 +27,21 @@ export default function ProjectPage() {
   const [isPinned, setIsPinned] = useState(false);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
   const [galleryProgress, setGalleryProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useLayoutEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleOptionWheelClick = (index) => {
+    const project = galleryProjects[index];
+    if (project?.id) {
+      window.location.hash = `#project-${project.id}`;
+    }
+  };
 
   // Performance tracking refs to prevent redundant React re-renders during high-frequency scroll
   const activeIndexRef = useRef(0);
@@ -60,119 +75,185 @@ export default function ProjectPage() {
     if (!containerRef.current || !innerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Timeline segmentation:
-      // 0.00 -> 0.35: Act 1 - Dial & 3D Cards (0% – 35%)
-      // 0.35 -> 0.40: Act 2 - Wheel Swift Exit (35% – 40%)
-      // 0.36 -> 1.00: Act 3 - Master Floating Gallery Sequence (starts immediately as wheel exits)
-      const p1End = 0.35;
-      const p2End = 0.40;
-      const galleryStart = 0.36;
+      const mm = gsap.matchMedia();
 
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: `+=${galleryProjects.length * 120 + 350}vh`,
-        pin: true,
-        scrub: 1.0, // Responsive, fluid catch-up curve
-        anticipatePin: 1,
-        fastScrollEnd: false, // Prevents GSAP from forcing animations to jump straight to the end
-        snap: {
-          // Snap strictly within Phase 1 (0.0 to 0.35) to catch each project
-          snapTo: (value) => {
-            if (value > p1End) return value; // Let gallery phases scroll seamlessly
-            const maxIndex = galleryProjects.length - 1;
-            const step = p1End / maxIndex;
-            return Math.min(p1End, Math.max(0, Math.round(value / step) * step));
+      // DESKTOP (> 768px): Both Option Wheel + 3D Cards AND Floating Gallery are active
+      mm.add("(min-width: 769px)", () => {
+        const p1End = 0.35;
+        const p2End = 0.40;
+        const galleryStart = 0.36;
+
+        ScrollTrigger.create({
+          trigger: containerRef.current,
+          start: 'top top',
+          end: `+=${galleryProjects.length * 120 + 350}vh`,
+          pin: true,
+          scrub: 1.0, // Responsive, fluid catch-up curve
+          anticipatePin: 1,
+          fastScrollEnd: false,
+          snap: {
+            snapTo: (value) => {
+              if (value > p1End) return value;
+              const maxIndex = galleryProjects.length - 1;
+              const step = p1End / maxIndex;
+              return Math.min(p1End, Math.max(0, Math.round(value / step) * step));
+            },
+            directional: true,
+            duration: { min: 0.2, max: 0.5 },
+            delay: 0.05,
+            ease: "power1.inOut"
           },
-          directional: true,
-          duration: { min: 0.2, max: 0.5 },
-          delay: 0.05,
-          ease: "power1.inOut"
-        },
-        onToggle: (self) => setIsPinned(self.isActive),
-        onUpdate: (self) => {
-          const p = self.progress;
-          const maxIndex = galleryProjects.length - 1;
+          onToggle: (self) => setIsPinned(self.isActive),
+          onUpdate: (self) => {
+            const p = self.progress;
+            const maxIndex = galleryProjects.length - 1;
 
-          // ACT 1: Dial & 3D Cards (0% – 35%)
-          if (p < p1End) {
-            const normP = p / p1End;
-            const targetIndex = normP * maxIndex;
-            const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
+            // ACT 1: Dial & 3D Cards (0% – 35%)
+            if (p < p1End) {
+              const normP = p / p1End;
+              const targetIndex = normP * maxIndex;
+              const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
 
-            wheelIndexRef.current = targetIndex;
-            setWheelScrollIndex(targetIndex);
+              wheelIndexRef.current = targetIndex;
+              setWheelScrollIndex(targetIndex);
 
-            if (newActive !== activeIndexRef.current) {
-              activeIndexRef.current = newActive;
-              setActiveIndex(newActive);
-            }
-            if (galleryProgressRef.current !== 0) {
-              galleryProgressRef.current = 0;
-              setGalleryProgress(0);
-            }
-
-            if (projectShowcaseRef.current) {
-              gsap.set(projectShowcaseRef.current, { x: 0, y: 0, opacity: 1, pointerEvents: 'auto' });
-            }
-            if (galleryShowcaseRef.current) {
-              gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, opacity: 0, pointerEvents: 'none' });
-            }
-            if (blackFadeRef.current) {
-              gsap.set(blackFadeRef.current, { opacity: 0 });
-            }
-          } else {
-            // ACT 2 & 3: Smooth Cross-Transition from Wheel Exit directly into Gallery Entrance
-            // Phase 2: Wheel glides up and dissolves (0.35 -> 0.40)
-            const exitP = Math.min(1, Math.max(0, (p - p1End) / (p2End - p1End)));
-            const targetIndex = maxIndex + exitP * 2.5;
-
-            wheelIndexRef.current = targetIndex;
-            setWheelScrollIndex(targetIndex);
-
-            if (projectShowcaseRef.current) {
-              const projectOpacity = Math.max(0, 1 - exitP * 1.2);
-              gsap.set(projectShowcaseRef.current, {
-                x: 0,
-                y: -exitP * 220,
-                opacity: projectOpacity,
-                pointerEvents: exitP > 0.4 ? 'none' : 'auto'
-              });
-            }
-
-            // Gallery progression starts blending in at 0.35
-            const galleryP = Math.min(1, Math.max(0, (p - galleryStart) / (1.00 - galleryStart)));
-
-            if (Math.abs(galleryP - galleryProgressRef.current) > 0.001) {
-              galleryProgressRef.current = galleryP;
-              setGalleryProgress(galleryP);
-            }
-
-            if (galleryShowcaseRef.current) {
-              // Smooth cross-fade entrance when gallery starts (0 to 1 over first 6%), and exit dissolve at end (> 0.96)
-              let galleryOpacity = 1;
-              if (galleryP < 0.08) {
-                galleryOpacity = galleryP / 0.08;
-              } else if (galleryP > 0.96) {
-                galleryOpacity = Math.max(0, (1 - galleryP) / 0.04);
+              if (newActive !== activeIndexRef.current) {
+                activeIndexRef.current = newActive;
+                setActiveIndex(newActive);
+              }
+              if (galleryProgressRef.current !== 0) {
+                galleryProgressRef.current = 0;
+                setGalleryProgress(0);
               }
 
-              gsap.set(galleryShowcaseRef.current, {
-                x: 0,
-                y: 0,
-                scale: 1,
-                opacity: galleryOpacity,
-                pointerEvents: galleryP >= 0.48 && galleryP < 0.76 ? 'auto' : 'none'
-              });
-            }
+              if (projectShowcaseRef.current) {
+                gsap.set(projectShowcaseRef.current, { x: 0, y: 0, opacity: 1, pointerEvents: 'auto' });
+              }
+              if (galleryShowcaseRef.current) {
+                gsap.set(galleryShowcaseRef.current, { x: 0, y: 0, scale: 1, opacity: 0, pointerEvents: 'none' });
+              }
+              if (blackFadeRef.current) {
+                gsap.set(blackFadeRef.current, { opacity: 0 });
+              }
+            } else {
+              // ACT 2 & 3: Smooth Cross-Transition from Wheel Exit directly into Gallery Entrance
+              const exitP = Math.min(1, Math.max(0, (p - p1End) / (p2End - p1End)));
+              const targetIndex = maxIndex + exitP * 2.5;
 
-            // Black fade-out transition as gallery concludes (0.78 -> 0.97)
-            if (blackFadeRef.current) {
-              const blackOpacity = Math.min(1, Math.max(0, (galleryP - 0.78) / 0.18));
-              gsap.set(blackFadeRef.current, { opacity: blackOpacity });
+              wheelIndexRef.current = targetIndex;
+              setWheelScrollIndex(targetIndex);
+
+              if (projectShowcaseRef.current) {
+                const projectOpacity = Math.max(0, 1 - exitP * 1.2);
+                gsap.set(projectShowcaseRef.current, {
+                  x: 0,
+                  y: -exitP * 220,
+                  opacity: projectOpacity,
+                  pointerEvents: exitP > 0.4 ? 'none' : 'auto'
+                });
+              }
+
+              // Gallery progression starts blending in at 0.35
+              const galleryP = Math.min(1, Math.max(0, (p - galleryStart) / (1.00 - galleryStart)));
+
+              if (Math.abs(galleryP - galleryProgressRef.current) > 0.001) {
+                galleryProgressRef.current = galleryP;
+                setGalleryProgress(galleryP);
+              }
+
+              if (galleryShowcaseRef.current) {
+                let galleryOpacity = 1;
+                if (galleryP < 0.08) {
+                  galleryOpacity = galleryP / 0.08;
+                } else if (galleryP > 0.96) {
+                  galleryOpacity = Math.max(0, (1 - galleryP) / 0.04);
+                }
+
+                gsap.set(galleryShowcaseRef.current, {
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                  opacity: galleryOpacity,
+                  pointerEvents: galleryP >= 0.48 && galleryP < 0.76 ? 'auto' : 'none'
+                });
+              }
+
+              // Black fade-out transition as gallery concludes (0.78 -> 0.97)
+              if (blackFadeRef.current) {
+                const blackOpacity = Math.min(1, Math.max(0, (galleryP - 0.78) / 0.18));
+                gsap.set(blackFadeRef.current, { opacity: blackOpacity });
+              }
             }
           }
-        }
+        });
+      });
+
+      // MOBILE & TABLET (<= 768px): Gallery section is SKIPPED!
+      // Only Option Wheel is scrolled, and smoothly transitions straight to the next section
+      mm.add("(max-width: 768px)", () => {
+        const maxIndex = galleryProjects.length - 1;
+
+        ScrollTrigger.create({
+          trigger: containerRef.current,
+          start: 'top top',
+          end: `+=${galleryProjects.length * 60 + 80}vh`,
+          pin: true,
+          scrub: 0.8,
+          anticipatePin: 1,
+          snap: {
+            snapTo: (value) => {
+              if (value > 0.85) return value;
+              const step = 0.85 / maxIndex;
+              return Math.min(0.85, Math.max(0, Math.round(value / step) * step));
+            },
+            duration: { min: 0.2, max: 0.4 },
+            ease: "power1.inOut"
+          },
+          onToggle: (self) => setIsPinned(self.isActive),
+          onUpdate: (self) => {
+            const p = self.progress;
+
+            // Gallery showcase is strictly invisible and inactive on mobile/tablet
+            if (galleryShowcaseRef.current) {
+              gsap.set(galleryShowcaseRef.current, { opacity: 0, pointerEvents: 'none' });
+            }
+
+            // 0.00 -> 0.85: Scroll through Option Wheel
+            if (p <= 0.85) {
+              const normP = p / 0.85;
+              const targetIndex = normP * maxIndex;
+              const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
+
+              wheelIndexRef.current = targetIndex;
+              setWheelScrollIndex(targetIndex);
+
+              if (newActive !== activeIndexRef.current) {
+                activeIndexRef.current = newActive;
+                setActiveIndex(newActive);
+              }
+
+              if (projectShowcaseRef.current) {
+                gsap.set(projectShowcaseRef.current, { y: 0, opacity: 1, pointerEvents: 'auto' });
+              }
+              if (blackFadeRef.current) {
+                gsap.set(blackFadeRef.current, { opacity: 0 });
+              }
+            } else {
+              // 0.85 -> 1.00: Smooth fade-out into black, seamlessly exiting to Skills
+              const exitP = (p - 0.85) / 0.15;
+              if (projectShowcaseRef.current) {
+                gsap.set(projectShowcaseRef.current, {
+                  y: -exitP * 120,
+                  opacity: Math.max(0, 1 - exitP * 1.5),
+                  pointerEvents: exitP > 0.4 ? 'none' : 'auto'
+                });
+              }
+              if (blackFadeRef.current) {
+                gsap.set(blackFadeRef.current, { opacity: exitP });
+              }
+            }
+          }
+        });
       });
 
       // Card Stack Transition Animation from Hero/About
@@ -251,29 +332,31 @@ export default function ProjectPage() {
           {/* LEFT: Option Wheel */}
           <div
             ref={wheelContainerRef}
-            className="w-full md:w-1/2 h-full flex items-center justify-start pointer-events-none relative z-10 px-4 md:px-0"
+            className="w-full md:w-1/2 h-full flex items-center justify-center md:justify-start pointer-events-auto relative z-10 px-4 md:px-0"
           >
             <OptionWheel
               items={items}
               controlledIndex={wheelScrollIndex}
               onChange={setActiveIndex}
+              onItemClick={handleOptionWheelClick}
               draggable={isPinned}
               maxOverscroll={5}
               side="left"
               textColor="#404040"
               activeColor={THEME_COLORS.vividCrimson}
-              curve={1.2}
-              tilt={10}
-              spacing={1.8}
-              fontSize={3.5}
+              curve={isMobile ? 0.8 : 1.2}
+              tilt={isMobile ? 8 : 10}
+              spacing={isMobile ? 1.6 : 1.8}
+              fontSize={isMobile ? 2.4 : 3.5}
+              inset={isMobile ? 20 : 80}
               smoothing={50}
             />
           </div>
 
-          {/* RIGHT: 3D Flipping Card - The Whole Div Flips from Bottom to Top */}
+          {/* RIGHT: 3D Flipping Card - Hidden on mobile screens (<= 768px), visible on md and up */}
           <div
             ref={imageCardRef}
-            className="w-full md:w-1/2 h-full relative z-0 flex items-center justify-center p-4 md:p-6 lg:p-8 overflow-hidden"
+            className="hidden md:flex w-full md:w-1/2 h-full relative z-0 items-center justify-center p-4 md:p-6 lg:p-8 overflow-hidden"
             style={{
               perspective: '1200px',
               perspectiveOrigin: 'center center',
@@ -327,7 +410,7 @@ export default function ProjectPage() {
                   <a
                     key={project.id}
                     href={`#project-${project.id}`}
-                    className="absolute inset-0 w-full h-full rounded-none overflow-hidden block will-change-transform transform-gpu cursor-pointer"
+                    className="absolute inset-0 w-full h-full rounded-sm overflow-hidden block will-change-transform transform-gpu cursor-pointer"
                     style={{
                       transform: transformStyle,
                       opacity: opacity,
@@ -354,7 +437,7 @@ export default function ProjectPage() {
                       overlayContent={
                         <div className="w-full">
                           <p className="tilted-card-demo-text flex items-center justify-between">
-                            
+
                           </p>
                         </div>
                       }
@@ -371,7 +454,7 @@ export default function ProjectPage() {
         {/* ========================================================================= */}
         <div
           ref={galleryShowcaseRef}
-          className="absolute inset-0 z-20 w-full h-full flex items-center justify-center will-change-transform pointer-events-none opacity-0"
+          className="hidden md:flex absolute inset-0 z-20 w-full h-full items-center justify-center will-change-transform pointer-events-none opacity-0"
         >
           <ParallaxFloatingDemo progress={galleryProgress} />
         </div>
@@ -386,7 +469,7 @@ export default function ProjectPage() {
       {/* Custom Floating Cursor for Project Card */}
       <div
         ref={cursorRef}
-        className={`fixed top-0 left-0 pointer-events-none z-[100] flex items-center justify-center transition-all duration-300 ease-out ${isHoveringImage ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
+        className={`hidden md:flex fixed top-0 left-0 pointer-events-none z-[100] items-center justify-center transition-all duration-300 ease-out ${isHoveringImage ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
       >
         <div className="w-28 h-16 md:w-36 md:h-9 rounded-[24px] bg-white/90 backdrop-blur-md flex items-center justify-center text-vivid-crimson font-heading text-[10px] md:text-xs font-bold uppercase tracking-widest text-center leading-tight shadow-[0_10px_30px_rgba(230,0,38,0.2)] border border-vivid-crimson/10">
           <span>See Project</span>

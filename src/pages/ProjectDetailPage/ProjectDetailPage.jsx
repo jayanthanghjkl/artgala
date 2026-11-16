@@ -128,7 +128,7 @@ export default function ProjectDetailPage({ projectId }) {
             <div className="w-full flex items-center justify-center order-1 lg:order-2 lg:col-span-7" style={{ perspective: '1000px' }}>
               <div 
                 ref={imageContainerRef}
-                className="w-full aspect-[16/10] sm:aspect-[16/9]   overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(230,0,38,0.2)] border border-white/15 bg-zinc-950/90 backdrop-blur-md transform-gpu relative group"
+                className="w-full aspect-[16/10] sm:aspect-[16/9]   overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(230,0,38,0.2)] border border-white/15 bg-zinc-950/90 backdrop-blur-md transform-gpu rounded-sm relative group"
                 style={{ transformStyle: 'preserve-3d' }}
                 onMouseMove={(e) => {
                   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -149,12 +149,10 @@ export default function ProjectDetailPage({ projectId }) {
                 <img 
                   src={project.image} 
                   alt={project.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out rounded-sm"
                 />
                 
-                {/* Subtle glass rim highlight */}
-                <div className="absolute inset-0 pointer-events-none rounded-xl sm:rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-vivid-crimson/30 transition-all duration-500" />
-              </div>
+                </div>
             </div>
           )}
 

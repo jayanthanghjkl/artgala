@@ -24,11 +24,11 @@ export default function WorkPage() {
         <InfiniteMenu
           items={items}
           count={12}
-          tileSize={0.63}
-          aspectRatio={1.55}
-          roundness={0.16}
+          tileSize={0.6}
+          aspectRatio={1.25}
+          roundness={0.05}
           zoom={1.65}
-          pullBack={0.35}
+          pullBack={1}
           stretch={0.15}
           inertia={0.65}
           autoplay={3}
