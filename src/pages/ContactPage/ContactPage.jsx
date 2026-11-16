@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import GhostFibers from '../../components/ui/GhostFibers';
 import { THEME_COLORS } from '../../lib/colors';
+import TextRoll from '../../components/common/TextRoll';
 
 export default function ContactPage({ isEmbedded = false }) {
   const navigate = useNavigate();
@@ -78,9 +79,10 @@ export default function ContactPage({ isEmbedded = false }) {
           transition={{ duration: 0.6, delay: 0.15 }}
           onClick={handleBack}
           type="button"
-          className="text-xs md:text-sm font-semibold tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 uppercase cursor-pointer py-1.5 px-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 focus:outline-none"
+          className="pointer-events-auto flex items-center gap-2 text-zinc-300 hover:text-white transition-colors duration-300 font-heading text-xs sm:text-sm font-bold tracking-widest uppercase group/link px-4 sm:px-5 py-2 sm:py-2.5"
+          aria-label="Go back"
         >
-          BACK
+          <TextRoll text="BACK" />
         </motion.button>
       </header>
 

@@ -88,7 +88,7 @@ export default function Footer25({
   };
 
   return (
-    <footer className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden bg-black text-[#FAFAFA] font-sans antialiased selection:bg-[#FAFAFA] selection:text-black">
+    <footer className="relative flex min-h-screen md:h-screen md:h-dvh w-full flex-col justify-between overflow-hidden bg-black text-[#FAFAFA] font-sans antialiased selection:bg-[#FAFAFA] selection:text-black">
       
       {/* GradientWaves Animated Interactive Canvas Backdrop */}
       <div className="absolute inset-0 z-0 bg-black overflow-hidden pointer-events-auto">
@@ -111,21 +111,21 @@ export default function Footer25({
         <div className="absolute inset-0 bg-gradient-to-b from-black via-black/20 to-transparent pointer-events-none" />
       </div>
 
-      {/* Main Content Container */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-between px-6 py-16 md:px-12 md:py-20 lg:py-24">
+      {/* Main Content Container - Fitted Screen Height */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 min-h-0 flex-col justify-between px-6 py-6 sm:py-8 md:px-12 md:py-10">
         
         {/* Top Section */}
-        <div className="flex flex-col gap-16 md:flex-row md:justify-between lg:gap-24">
+        <div className="flex flex-col gap-6 md:flex-row md:justify-between lg:gap-16 shrink-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-2 sm:gap-3"
           >
-            <Link to="/work" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Work</Link>
-            <Link to="/info" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Info</Link>
-            <Link to="/contact" className="text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer sm:text-4xl">Contact</Link>
+            <Link to="/work" className="text-2xl sm:text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer lg:text-4xl">Work</Link>
+            <Link to="/info" className="text-2xl sm:text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer lg:text-4xl">Info</Link>
+            <Link to="/contact" className="text-2xl sm:text-3xl font-semibold tracking-tight transition-opacity hover:text-vivid-crimson cursor-pointer lg:text-4xl">Contact</Link>
           </motion.div>
 
           <motion.div
@@ -135,14 +135,14 @@ export default function Footer25({
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="flex w-full max-w-sm flex-col md:max-w-md"
           >
-            <p className="mb-8 text-xl text-zinc-200 md:text-2xl">
+            <p className="mb-4 sm:mb-6 text-lg sm:text-xl text-zinc-200 md:text-2xl">
               Let's connect and build something <br className="hidden sm:block" /> meaningful together.
             </p>
             
             {/* Direct Email Submission Form */}
             <form 
               onSubmit={handleEmailSubmit}
-              className="relative flex items-center justify-between border-b border-white/20 pb-4 transition-colors focus-within:border-white"
+              className="relative flex items-center justify-between border-b border-white/20 pb-3 transition-colors focus-within:border-white"
             >
               <input
                 type="email"
@@ -150,7 +150,7 @@ export default function Footer25({
                 required
                 disabled={isSubmitting}
                 placeholder={isSubmitting ? "Submitting..." : "Email address"}
-                className="w-full bg-transparent text-lg text-white placeholder-zinc-500 outline-none disabled:opacity-50"
+                className="w-full bg-transparent text-base sm:text-lg text-white placeholder-zinc-500 outline-none disabled:opacity-50"
               />
               <button
                 type="submit"
@@ -173,7 +173,7 @@ export default function Footer25({
           whileInView={{ opacity: 1 }}
           viewport={{ once: false }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-24 mb-16 flex items-center justify-between"
+          className="my-auto py-3 sm:py-5 flex items-center justify-between shrink-0"
         >
           {/* Horizontal line extending from the left */}
           <div className="hidden h-px flex-1 bg-white/20 md:block md:mr-16 lg:mr-32" />
@@ -207,11 +207,11 @@ export default function Footer25({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-auto mb-10 w-full"
+          className="w-full mt-auto mb-4 sm:mb-6"
         >
           <svg 
             viewBox="0 0 1040 200" 
-            className="h-auto w-full fill-current text-white" 
+            className="w-full h-auto fill-current text-white" 
             aria-hidden="true"
             preserveAspectRatio="xMidYMid meet"
           >
@@ -237,12 +237,12 @@ export default function Footer25({
           whileInView={{ opacity: 1 }}
           viewport={{ once: false }}
           transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-start justify-between gap-4 text-white md:flex-row md:items-end"
+          className="flex flex-col items-start justify-between gap-2 sm:gap-4 text-white md:flex-row md:items-end shrink-0"
         >
-          <p className="max-w-3xl leading-relaxed text-sm text-zinc-400">
-            © 2026 Jayanthan Sathiyapal. All rights reserved. <br /> Built with React, GSAP, Tailwind CSS, and Framer Motion.
+          <p className="max-w-3xl leading-relaxed text-xs sm:text-sm text-zinc-400">
+            © 2026 Jayanthan Sathiyapal. All rights reserved. <br className="hidden sm:inline" /> Built with React, GSAP, Tailwind CSS, and Framer Motion.
           </p>
-          <div className="flex items-center gap-8 whitespace-nowrap font-medium text-sm text-zinc-400">
+          <div className="flex items-center gap-6 sm:gap-8 whitespace-nowrap font-medium text-xs sm:text-sm text-zinc-400">
             <a href="mailto:jayanthansathiyapal@gmail.com" className="transition-colors hover:text-white">Email Me</a>
             <a href="https://github.com/jayanthanghjkl" className="transition-colors hover:text-white">GitHub profile</a>
           </div>

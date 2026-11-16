@@ -12,6 +12,7 @@ uniform mat4 uProjection;
 uniform float uCamera;
 uniform float uRadius;
 uniform float uTileRadius;
+uniform float uAspect;
 uniform vec4 uSpin;
 uniform float uStretch;
 uniform float uShift;
@@ -30,7 +31,7 @@ void main() {
   vec3 tangent = normalize(cross(reference, center));
   vec3 bitangent = cross(center, tangent);
   float front = max(center.z, 0.0);
-  vec3 offset = (tangent * aCorner.x + bitangent * aCorner.y) * uTileRadius * mix(0.5, 1.0, front);
+  vec3 offset = (tangent * (aCorner.x * uAspect) + bitangent * aCorner.y) * uTileRadius * mix(0.5, 1.0, front);
   vec3 motion = cross(uSpin.xyz, center);
   float sweep = length(motion);
   if (sweep > 0.0001) {
@@ -52,6 +53,7 @@ uniform sampler2D uAtlas;
 uniform float uCells;
 uniform float uInset;
 uniform float uRoundness;
+uniform float uAspect;
 uniform float uGrayscale;
 uniform float uDim;
 uniform float uReveal;
@@ -63,8 +65,11 @@ flat in int vItem;
 out vec4 outColor;
 
 void main() {
-  float corner = clamp(uRoundness, 0.0, 1.0);
-  vec2 q = abs(vUv) - (1.0 - corner);
+  float r = clamp(uRoundness, 0.0, 1.0);
+  vec2 halfSize = vec2(uAspect, 1.0);
+  vec2 p = vec2(vUv.x * uAspect, vUv.y);
+  float corner = r * min(halfSize.x, halfSize.y);
+  vec2 q = abs(p) - (halfSize - corner);
   float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - corner;
   float aa = max(fwidth(d), 0.0001);
   float mask = 1.0 - smoothstep(-aa, aa, d);
@@ -156,9 +161,10 @@ const ArrowIcon = () => (
 
 const InfiniteMenu = ({
   items = [],
-  count = 12,
+  count = 160,
   tileSize = 0.63,
-  roundness = 0.2,
+  aspectRatio = 1.55,
+  roundness = 0.18,
   zoom = 1.65,
   pullBack = 1,
   stretch = 0.6,
@@ -187,10 +193,11 @@ const InfiniteMenu = ({
   const settings = {
     count: clamp(Math.round(count), 6, 400),
     tileSize: clamp(tileSize, 0.2, 1.2),
-    roundness: clamp(roundness, 0, 0),
+    aspectRatio: clamp(aspectRatio, 0.5, 3.0),
+    roundness: clamp(roundness, 0, 1),
     zoom: clamp(zoom, 0.2, 4),
     pullBack: clamp(pullBack, 0, 3),
-    stretch: clamp(stretch, 0, 0),
+    stretch: clamp(stretch, 0, 3),
     inertia: clamp(inertia, 0, 1),
     autoplay: Math.max(0, autoplay),
     grayscale,
@@ -229,6 +236,7 @@ const InfiniteMenu = ({
       'uCamera',
       'uRadius',
       'uTileRadius',
+      'uAspect',
       'uSpin',
       'uStretch',
       'uShift',
@@ -287,7 +295,7 @@ const InfiniteMenu = ({
     gl.uniform1i(uniforms.uAtlas, 0);
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const atlas = { canvas: document.createElement('canvas'), cells: 1, cell: 512, request: 0, dirty: false };
+    const atlas = { canvas: document.createElement('canvas'), cells: 1, cellW: 512, cellH: 330, request: 0, dirty: false };
     const drag = { active: false, id: -1, x: 0, y: 0, dx: 0, dy: 0, moved: 0, start: 0 };
     const state = {
       width: 1,
@@ -369,11 +377,14 @@ const InfiniteMenu = ({
 
     const loadItems = list => {
       const request = ++atlas.request;
+      const s = settingsRef.current;
       const total = Math.max(1, list.length);
       atlas.cells = Math.ceil(Math.sqrt(total));
-      atlas.cell = clamp(Math.floor(4096 / atlas.cells), 64, 512);
-      atlas.canvas.width = atlas.cells * atlas.cell;
-      atlas.canvas.height = atlas.cells * atlas.cell;
+      const baseCell = clamp(Math.floor(4096 / (atlas.cells * Math.max(1, s.aspectRatio))), 64, 512);
+      atlas.cellH = baseCell;
+      atlas.cellW = Math.round(baseCell * s.aspectRatio);
+      atlas.canvas.width = atlas.cells * atlas.cellW;
+      atlas.canvas.height = atlas.cells * atlas.cellH;
       const ctx = atlas.canvas.getContext('2d');
       ctx?.clearRect(0, 0, atlas.canvas.width, atlas.canvas.height);
       uploadAtlas();
@@ -392,30 +403,31 @@ const InfiniteMenu = ({
         };
         image.onload = () => {
           if (!alive || request !== atlas.request || !ctx) return;
-          const size = atlas.cell;
-          const x = (index % atlas.cells) * size;
-          const y = Math.floor(index / atlas.cells) * size;
-          const mode = settingsRef.current.imageFit || 'fit';
+          const w = atlas.cellW;
+          const h = atlas.cellH;
+          const x = (index % atlas.cells) * w;
+          const y = Math.floor(index / atlas.cells) * h;
+          const mode = s.imageFit || 'fit';
 
           ctx.save();
           ctx.beginPath();
-          ctx.rect(x, y, size, size);
+          ctx.rect(x, y, w, h);
           ctx.clip();
 
           if (mode === 'fit' || mode === 'fill') {
-            ctx.drawImage(image, x, y, size, size);
+            ctx.drawImage(image, x, y, w, h);
           } else if (mode === 'contain') {
             ctx.fillStyle = '#121215';
-            ctx.fillRect(x, y, size, size);
-            const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
-            const width = image.naturalWidth * scale;
-            const height = image.naturalHeight * scale;
-            ctx.drawImage(image, x + (size - width) / 2, y + (size - height) / 2, width, height);
+            ctx.fillRect(x, y, w, h);
+            const scale = Math.min(w / image.naturalWidth, h / image.naturalHeight);
+            const imgW = image.naturalWidth * scale;
+            const imgH = image.naturalHeight * scale;
+            ctx.drawImage(image, x + (w - imgW) / 2, y + (h - imgH) / 2, imgW, imgH);
           } else {
-            const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
-            const width = image.naturalWidth * scale;
-            const height = image.naturalHeight * scale;
-            ctx.drawImage(image, x + (size - width) / 2, y + (size - height) / 2, width, height);
+            const scale = Math.max(w / image.naturalWidth, h / image.naturalHeight);
+            const imgW = image.naturalWidth * scale;
+            const imgH = image.naturalHeight * scale;
+            ctx.drawImage(image, x + (w - imgW) / 2, y + (h - imgH) / 2, imgW, imgH);
           }
 
           ctx.restore();
@@ -444,11 +456,13 @@ const InfiniteMenu = ({
       const rest = restDistance();
       const radius = (tileRadius() / ((rest - RADIUS) * Math.tan(FOV / 2))) * (state.height / 2);
       const rounded = Math.round(radius);
-      if (rounded !== state.tilePx) {
-        state.tilePx = rounded;
-        root.style.setProperty('--infinite-menu-tile', `${rounded}px`);
+      const halfWidthPx = Math.round(radius * settingsRef.current.aspectRatio);
+      if (halfWidthPx !== state.tilePx) {
+        state.tilePx = halfWidthPx;
+        root.style.setProperty('--infinite-menu-tile', `${halfWidthPx}px`);
+        root.style.setProperty('--infinite-menu-tile-height', `${rounded}px`);
       }
-      const mode = state.width / 2 - radius < 120 ? 'stacked' : 'side';
+      const mode = state.width / 2 - halfWidthPx < 120 ? 'stacked' : 'side';
       if (mode !== state.layout) {
         state.layout = mode;
         setLayout(mode);
@@ -506,6 +520,7 @@ const InfiniteMenu = ({
       const x = (((clientX - rect.left) / rect.width) * 2 - 1) * aspect;
       const y = 1 - ((clientY - rect.top) / rect.height) * 2 - state.shift;
       const radius = tileRadius();
+      const cardAspect = settingsRef.current.aspectRatio;
       let best = -1;
       let bestDistance = Infinity;
       for (let i = 0; i < state.tiles.length; i++) {
@@ -514,9 +529,12 @@ const InfiniteMenu = ({
         const depth = state.camera - c[2] * RADIUS;
         const sx = (c[0] * RADIUS) / (depth * span);
         const sy = (c[1] * RADIUS) / (depth * span);
-        const reach = (radius * (0.5 + 0.5 * c[2])) / (depth * span);
-        const distance = Math.hypot(sx - x, sy - y);
-        if (distance < reach && distance < bestDistance) {
+        const reachX = (radius * cardAspect * (0.5 + 0.5 * c[2])) / (depth * span);
+        const reachY = (radius * (0.5 + 0.5 * c[2])) / (depth * span);
+        const dx = (sx - x) / Math.max(0.001, reachX);
+        const dy = (sy - y) / Math.max(0.001, reachY);
+        const distance = Math.hypot(dx, dy);
+        if (distance < 1.0 && distance < bestDistance) {
           bestDistance = distance;
           best = i;
         }
@@ -679,11 +697,12 @@ const InfiniteMenu = ({
       gl.uniform1f(uniforms.uCamera, state.camera);
       gl.uniform1f(uniforms.uRadius, RADIUS);
       gl.uniform1f(uniforms.uTileRadius, tileRadius());
+      gl.uniform1f(uniforms.uAspect, s.aspectRatio);
       gl.uniform4f(uniforms.uSpin, state.axis[0], state.axis[1], state.axis[2], reduce ? 0 : state.speed);
       gl.uniform1f(uniforms.uStretch, s.stretch);
       gl.uniform1f(uniforms.uShift, state.shift);
       gl.uniform1f(uniforms.uCells, atlas.cells);
-      gl.uniform1f(uniforms.uInset, 2 / atlas.cell);
+      gl.uniform1f(uniforms.uInset, 2 / Math.max(atlas.cellW, atlas.cellH));
       gl.uniform1f(uniforms.uRoundness, s.roundness);
       gl.uniform1f(uniforms.uGrayscale, s.grayscale ? 1 : 0);
       gl.uniform1f(uniforms.uDim, s.dim * (0.45 + 0.55 * state.settle));

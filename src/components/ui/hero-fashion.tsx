@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import TextRoll from "../common/TextRoll";
 
 interface HeroFashionProps {
   title?: string;
@@ -50,10 +50,10 @@ export default function HomePage({
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-zinc-700 hover:text-black transition-colors duration-200 font-medium text-xs md:text-sm tracking-wider uppercase bg-white/90 hover:bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-sm backdrop-blur-md group"
+            className="pointer-events-auto flex items-center gap-2 text-zinc-1000 hover:text-white transition-colors duration-300 font-heading text-xs sm:text-sm font-bold tracking-widest uppercase group/link  px-4 sm:px-5 py-2 sm:py-2.5"
+            aria-label="Go back"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" />
-            <span>Back to Home</span>
+            <TextRoll text="BACK" />
           </Link>
         </motion.header>
       )}

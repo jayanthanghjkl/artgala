@@ -4,7 +4,7 @@ import { projectsList } from '../../data/projects';
 
 /**
  * WorkPage component.
- * Integrates the InfiniteMenu 3D sphere component from React Bits.
+ * Integrates the InfiniteMenu 3D sphere component with modern widescreen rectangular cards.
  */
 export default function WorkPage() {
   const items = useMemo(() => {
@@ -25,7 +25,8 @@ export default function WorkPage() {
           items={items}
           count={12}
           tileSize={0.63}
-          roundness={0.2}
+          aspectRatio={1.55}
+          roundness={0.16}
           zoom={1.65}
           pullBack={0.35}
           stretch={0.15}

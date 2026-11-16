@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TiltCascadeCarousel from '@/components/ui/tilt-cascade-carousel';
 import { galleryItems } from '@/data/gallery';
+import TextRoll from '@/components/common/TextRoll';
 
 export default function ClosetPage() {
   const navigate = useNavigate();
@@ -44,11 +45,10 @@ export default function ClosetPage() {
       >
         <button
           onClick={() => navigate('/')}
-          className="pointer-events-auto group flex items-center gap-2 px-4 py-2 rounded-full bg-black/50 hover:bg-white/10 backdrop-blur-md border border-white/15 text-white/80 hover:text-white transition-all duration-300 text-xs tracking-wider uppercase font-medium shadow-lg"
-          aria-label="Back to home"
+          className="pointer-events-auto flex items-center gap-2 text-zinc-300 hover:text-white transition-colors duration-300 font-heading text-xs sm:text-sm font-bold tracking-widest uppercase group/link bg-black/60 hover:bg-black/90 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full backdrop-blur-md shadow-lg"
+          aria-label="Go back"
         >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back</span>
+          <TextRoll text="BACK" />
         </button>
       </motion.header>
 
