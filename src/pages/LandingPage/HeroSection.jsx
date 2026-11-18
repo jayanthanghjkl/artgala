@@ -288,6 +288,18 @@ export default function HeroSection({ isEntered = true, children }) {
           animation: none !important;
         }
 
+        /* Navbar reveal coordinated with loading (hidden during initial loader, fades in with text roll) */
+        body:not(.loaded) .hero-navbar {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+
+        body.loaded .hero-navbar {
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+        }
+
         .vertical-text {
           writing-mode: vertical-lr;
           transform: rotate(180deg);

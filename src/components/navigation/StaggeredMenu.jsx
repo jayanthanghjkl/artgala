@@ -392,6 +392,74 @@ export const StaggeredMenu = ({
     }
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
 
+  // Loading Screen Text Roll Animation for the Menu
+  const playLoadRoll = useCallback(() => {
+    if (openRef.current) return;
+    const inner = textInnerRef.current;
+    const icon = iconRef.current;
+    const btn = toggleBtnRef.current;
+    if (!inner) return;
+
+    textCycleAnimRef.current?.kill();
+
+    // Sequence of rolling words ending cleanly on 'Menu'
+    const seq = ['Menu', 'Close', 'Menu', 'Close', 'Menu'];
+    setTextLines(seq);
+
+    gsap.set(inner, { yPercent: 0 });
+    if (btn) {
+      gsap.fromTo(
+        btn,
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
+      );
+    }
+    if (icon) {
+      gsap.fromTo(
+        icon,
+        { rotate: -270, scale: 0.7 },
+        { rotate: 0, scale: 1, duration: 1.1, ease: 'power4.out', delay: 0.15 }
+      );
+    }
+
+    const lineCount = seq.length;
+    const finalShift = ((lineCount - 1) / lineCount) * 100;
+
+    textCycleAnimRef.current = gsap.to(inner, {
+      yPercent: -finalShift,
+      duration: 1.15,
+      ease: 'power4.out',
+      delay: 0.15
+    });
+  }, []);
+
+  React.useEffect(() => {
+    let hasTriggered = false;
+
+    const trigger = () => {
+      if (hasTriggered) return;
+      hasTriggered = true;
+      playLoadRoll();
+    };
+
+    if (typeof document !== 'undefined') {
+      if (document.body.classList.contains('loaded')) {
+        const timer = setTimeout(trigger, 120);
+        return () => clearTimeout(timer);
+      }
+
+      const observer = new MutationObserver(() => {
+        if (document.body.classList.contains('loaded')) {
+          observer.disconnect();
+          trigger();
+        }
+      });
+
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    }
+  }, [playLoadRoll]);
+
   React.useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
