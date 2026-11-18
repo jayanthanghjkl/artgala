@@ -27,8 +27,9 @@ export default function HeroTransitionWrapper({ isEntered = true }) {
         }
       });
 
-      // Ensure initial position is completely below viewport
+      // Ensure initial positions at resting hero state
       gsap.set('.hero-blackout-overlay', { yPercent: 100 });
+      gsap.set('.hero-navbar', { opacity: 1 });
 
       // We start the text centering immediately without waiting for the 3D model to finish zooming.
       tl.add('start')
@@ -39,7 +40,7 @@ export default function HeroTransitionWrapper({ isEntered = true }) {
         .to('.hero-blackout-overlay', { yPercent: 0, duration: 1, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-model-canvas', { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-desc-wrapper', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
-        .to('.hero-navbar', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
+        .fromTo('.hero-navbar', { opacity: 1 }, { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
         .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
         
         // --- PHASE 2: Split Text & Zoom In (Expanding Frame) ---
