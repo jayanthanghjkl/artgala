@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import HeroTransitionWrapper from '../components/layout/HeroTransitionWrapper';
 import ProjectPage from './ProjectPage/ProjectPage';
@@ -6,17 +5,20 @@ import StaggeredGrid from './SkillsPage/staggeredGrid';
 import AchievementsPage from './AchievementsPage/AchievementsPage';
 import Footer25 from '../components/ui/Footer25';
 import { skillsBentoItems, skillsGridImages } from '../data/skills';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 export default function Home() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {/* Master Wrapper for Hero and About transitions */}
-      <HeroTransitionWrapper />
+    <>
+      <LoadingScreen />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Master Wrapper for Hero and About transitions */}
+        <HeroTransitionWrapper />
 
       {/* Unified Project & Gallery Showcase with single persistent static background */}
       <ProjectPage />
@@ -48,5 +50,6 @@ export default function Home() {
         <Footer25 />
       </div>
     </motion.div>
+    </>
   );
 }

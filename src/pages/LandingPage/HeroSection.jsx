@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -18,15 +18,29 @@ const LERP_SCROLL = 0.9;          // Smoothing interpolation factor for scrolls
 const LERP_CURSOR = 0.9;          // Smoothing interpolation factor for mouse parallax
 
 // ── 3D MODEL ELEMENT ────────────────────────────────────────────────────────
-function HeroModel({ meshRef }) {
+function HeroModel({ meshRef, isEntered }) {
   const gltf = useGLTF('/hero-optimized.glb');
+  const scaleVal = useRef(isEntered ? 8.5 : 6.0);
+  const rotY = useRef(isEntered ? 0 : -0.25);
+
+  useFrame((_, delta) => {
+    const targetScale = isEntered ? 8.5 : 6.0;
+    const targetRotY = isEntered ? 0 : -0.25;
+    scaleVal.current = THREE.MathUtils.lerp(scaleVal.current, targetScale, Math.min(delta * 3.5, 0.08));
+    rotY.current = THREE.MathUtils.lerp(rotY.current, targetRotY, Math.min(delta * 3.5, 0.08));
+
+    if (meshRef.current) {
+      meshRef.current.scale.set(scaleVal.current, scaleVal.current, scaleVal.current);
+      meshRef.current.rotation.y = targetRotY === 0 && Math.abs(rotY.current) < 0.005 ? 0 : rotY.current;
+    }
+  });
 
   return (
     <primitive
       ref={meshRef}
       object={gltf.scene}
       position={[0, -0.3, 0]}
-      scale={[8.50, 8.5, 8.5]}
+      scale={[8.5, 8.5, 8.5]}
     />
   );
 }
@@ -68,7 +82,7 @@ function CameraController({ spiralRef, cursorRef, isEntered }) {
 }
 
 // ── COMBINED HERO & 3D CANVAS COMPONENT ─────────────────────────────────────
-export default function HeroSection({ isEntered, children }) {
+export default function HeroSection({ isEntered = true, children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isHeroActive, setIsHeroActive] = useState(false);
 
@@ -182,7 +196,7 @@ export default function HeroSection({ isEntered, children }) {
         />
 
         {/* WebGL Canvas with chiaroscuro lighting */}
-        <div className="absolute inset-0 z-[3]">
+        <div className="hero-model-canvas absolute inset-0 z-[3]">
           <Canvas
             camera={{ position: CAMERA_BASE_POS, fov: 38 }}
             style={{ pointerEvents: 'none' }}
@@ -199,7 +213,7 @@ export default function HeroSection({ isEntered, children }) {
             <pointLight position={[12, 6, -8]} intensity={40} distance={40} decay={2} color="#9e0c1b" />
 
             <Suspense fallback={null}>
-              <HeroModel meshRef={meshRef} />
+              <HeroModel meshRef={meshRef} isEntered={isEntered} />
             </Suspense>
 
             <CameraController spiralRef={spiralRef} cursorRef={cursorRef} isEntered={isEntered} />
@@ -216,13 +230,9 @@ export default function HeroSection({ isEntered, children }) {
           from { transform: translateY(105%) scaleY(1.05); opacity: 0; }
           to   { transform: translateY(0) scaleY(1); opacity: 1; }
         }
-        @keyframes heroDescReveal {
-          from { transform: translateY(20px); opacity: 0; filter: blur(3px); }
-          to   { transform: translateY(0); opacity: 1; filter: blur(0); }
-        }
         
         /* Dormant States: Safely hidden out of view to handle reverse entry snap */
-        .hero-title-anim-1, .hero-title-anim-2, .hero-desc-anim {
+        .hero-title-anim-1, .hero-title-anim-2 {
           opacity: 0;
           display: inline-block;
         }
@@ -234,8 +244,48 @@ export default function HeroSection({ isEntered, children }) {
         .hero-view-active .hero-title-anim-2 {
           animation: heroTitleReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
         }
-        .hero-view-active .hero-desc-anim {
-          animation: heroDescReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+
+        /* Coordinated states with LoadingScreen */
+        body:not(.loaded) #targetHeading {
+          opacity: 0 !important;
+        }
+        body:not(.loaded) #targetHeading .hero-title-anim-1,
+        body:not(.loaded) #targetHeading .hero-title-anim-2 {
+          opacity: 0 !important;
+          transform: none !important;
+          animation: none !important;
+        }
+        body.loaded #targetHeading {
+          opacity: 1 !important;
+          transition: none !important;
+        }
+        body.loaded #targetHeading .hero-title-anim-1,
+        body.loaded #targetHeading .hero-title-anim-2 {
+          opacity: 1 !important;
+          transform: none !important;
+          animation: none !important;
+        }
+
+        /* Subtitle Paragraph reveal coordinated with loading (no blur, no dim/brighten flash) */
+        .hero-desc-anim {
+          opacity: 0;
+          transform: translateY(16px);
+          display: inline-block;
+          filter: none !important;
+          text-shadow: none !important;
+        }
+
+        body:not(.loaded) .hero-desc-anim {
+          opacity: 0 !important;
+          transform: translateY(16px) !important;
+          animation: none !important;
+        }
+
+        body.loaded .hero-desc-anim {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
+          animation: none !important;
         }
 
         .vertical-text {
@@ -259,12 +309,7 @@ export default function HeroSection({ isEntered, children }) {
 
       {/* Top Left: Subtitle description (Desktop >= 768px) */}
       <div className="hidden md:block absolute md:top-8 md:left-9 hero-desc-wrapper overflow-hidden z-30 pointer-events-auto">
-        <p
-          className="hero-desc-anim font-sans text-[16px] text-white/70 leading-[1.62] tracking-[0.03em] font-normal max-w-[340px]"
-          style={{
-            textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.76)',
-          }}
-        >
+        <p className="hero-desc-anim font-sans text-[16px] text-white/70 leading-[1.62] tracking-[0.03em] font-normal max-w-[340px]">
           Building digital experiences<br />
           that blend intuitive design with clean<br />
           scalable code
@@ -285,12 +330,7 @@ export default function HeroSection({ isEntered, children }) {
         <div className="hero-text-container relative z-10 w-full mx-auto flex flex-col items-start overflow-visible">
           {/* Mobile View (< 768px): Subtitle positioned directly above Jayanthan Sathiyapal */}
           <div className="block md:hidden w-full px-2 sm:px-3 mb-2 sm:mb-3 hero-desc-wrapper overflow-hidden pointer-events-auto">
-            <p
-              className="hero-desc-anim font-sans text-[12px] sm:text-[13px] text-white/80 leading-[1.5] tracking-[0.03em] font-normal text-left"
-              style={{
-                textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.76)',
-              }}
-            >
+            <p className="hero-desc-anim font-sans text-[12px] sm:text-[13px] text-white/80 leading-[1.5] tracking-[0.03em] font-normal text-left">
               Building digital experiences<br />
               that blend intuitive design with clean<br />
               scalable code
@@ -298,23 +338,28 @@ export default function HeroSection({ isEntered, children }) {
           </div>
 
           <h1
+            id="targetHeading"
             className="w-full text-center whitespace-nowrap select-none overflow-visible flex items-baseline justify-center tracking-[-0.02em] leading-[0.96] text-[#F4F1EA] pb-3 sm:pb-5 md:pb-0"
             style={{
               fontSize: 'clamp(2.4rem, 11.5vw, 22rem)',
-              textShadow:
-                '0 4px 20px rgba(0, 0, 0, 0.98), 0 10px 40px rgba(0, 0, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.95)',
-              filter: 'drop-shadow(0 8px 24px rgba(0, 0, 0, 0.9))',
+              filter: 'none',
+              textShadow: 'none',
+              transition: 'none',
             }}
           >
             <span
-              className="hero-name-left flex-1 flex justify-end pr-2 sm:pr-3 md:pr-4 font-extralight overflow-visible pb-2 sm:pb-3"
+              className="hero-name-left flex-1 flex justify-end pr-2 sm:pr-3 md:pr-5 font-extralight overflow-visible pb-2 sm:pb-3"
               style={{
                 fontFamily: "'GGX89 Extra Light', 'Ggx89', 'GGX89', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif",
                 fontWeight: 400,
                 letterSpacing: '-0.034em',
               }}
             >
-              <span className="hero-title-anim-1 overflow-visible inline-block">Jayanthan</span>
+              <span className="hero-title-anim-1 overflow-visible inline-block">
+                {'Jayanthan'.split('').map((char, i) => (
+                  <span key={i} className="inline-block">{char}</span>
+                ))}
+              </span>
             </span>
             <span
               className="hero-name-right flex-1 flex justify-start pl-2 sm:pl-3 md:pl-7 italic font-normal overflow-visible pb-2 sm:pb-3"
@@ -325,7 +370,11 @@ export default function HeroSection({ isEntered, children }) {
                 letterSpacing: '-0.02em',
               }}
             >
-              <span className="hero-title-anim-2 overflow-visible inline-block">Sathiyapal.</span>
+              <span className="hero-title-anim-2 overflow-visible inline-block">
+                {'Sathiyapal.'.split('').map((char, i) => (
+                  <span key={i} className="inline-block">{char}</span>
+                ))}
+              </span>
             </span>
           </h1>
         </div>

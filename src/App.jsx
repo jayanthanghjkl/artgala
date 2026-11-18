@@ -9,6 +9,7 @@ import HeroFashion from './components/ui/hero-fashion';
 import ProjectDetailPage from './pages/ProjectDetailPage/ProjectDetailPage';
 import ContactPage from './pages/ContactPage/ContactPage';
 import SkillsPage from './pages/SkillsPage/SkillsPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import ScrollToTop from './components/common/ScrollToTop';
 import Lenis from 'lenis';
 import gsap from 'gsap';
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/skills" element={<SkillsPage />} />
           <Route path="/info" element={<HeroFashion />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AnimatePresence>
 

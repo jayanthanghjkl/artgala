@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import HeroSection from '../../pages/LandingPage/HeroSection';
@@ -7,7 +7,7 @@ import DecryptedText from '../effects/DecryptedText';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HeroTransitionWrapper() {
+export default function HeroTransitionWrapper({ isEntered = true }) {
   const containerRef = useRef(null);
   const [triggerDecrypt, setTriggerDecrypt] = useState(false);
   const [paraProgress1, setParaProgress1] = useState(0);
@@ -117,7 +117,7 @@ export default function HeroTransitionWrapper() {
       
       {/* Layer 1: Hero Section (Contains 3D Canvas, Expanding Frame, and Text) */}
       <div className="absolute inset-0 z-10 w-full h-full">
-        <HeroSection isEntered={true}>
+        <HeroSection isEntered={isEntered}>
           <div className="decrypt-text-wrapper opacity-0 font-heading text-black text-xl md:text-3xl lg:text-5xl font-medium tracking-tight px-6 text-center">
             <DecryptedText
               text="I build websites and applications like this."
