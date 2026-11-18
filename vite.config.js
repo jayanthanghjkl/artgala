@@ -21,6 +21,10 @@ export default defineConfig({
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
   },
   server: {
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
     allowedHosts: [
       'unvitiable-amya-dimensionally.ngrok-free.dev',
       '.ngrok-free.dev'
