@@ -306,8 +306,17 @@ export default function HeroSection({ isEntered = true, children }) {
         }
       `}} />
 
-      {/* Blur & Total Blackout overlay for transition (Placed below expanding frame) */}
-      <div className="hero-blur-overlay absolute inset-0 bg-[#070103] backdrop-blur-md opacity-0 pointer-events-none z-10" />
+      {/* Total Blackout Curtain for transition (Rises from bottom to top, lag-free hardware accelerated) */}
+      <div
+        className="hero-blackout-overlay absolute inset-x-0 bottom-0 pointer-events-none z-10"
+        style={{
+          top: '-120px',
+          height: 'calc(100% + 120px)',
+          background: 'linear-gradient(to top, #070103 0%, #070103 calc(100% - 120px), rgba(7, 1, 3, 0.8) calc(100% - 50px), transparent 100%)',
+          transform: 'translateY(100%)',
+          willChange: 'transform',
+        }}
+      />
 
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
