@@ -300,6 +300,29 @@ export default function HeroSection({ isEntered = true, children }) {
           transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
         }
 
+        /* Blackout Curtain (Pure Solid #070103, Hardware-Accelerated 120fps Zero Lag) */
+        .hero-blackout-overlay {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #070103;
+          z-index: 10;
+          pointer-events: none;
+          will-change: transform;
+        }
+
+        .hero-blackout-overlay::before {
+          content: '';
+          position: absolute;
+          bottom: 100%;
+          left: 0;
+          right: 0;
+          height: 120px;
+          background: linear-gradient(to top, #070103 0%, rgba(7, 1, 3, 0.8) 50%, transparent 100%);
+          pointer-events: none;
+        }
+
         .vertical-text {
           writing-mode: vertical-lr;
           transform: rotate(180deg);
@@ -307,16 +330,7 @@ export default function HeroSection({ isEntered = true, children }) {
       `}} />
 
       {/* Total Blackout Curtain for transition (Rises from bottom to top, lag-free hardware accelerated) */}
-      <div
-        className="hero-blackout-overlay absolute inset-x-0 bottom-0 pointer-events-none z-10"
-        style={{
-          top: '-120px',
-          height: 'calc(100% + 120px)',
-          background: 'linear-gradient(to top, #070103 0%, #070103 calc(100% - 120px), rgba(7, 1, 3, 0.8) calc(100% - 50px), transparent 100%)',
-          transform: 'translateY(100%)',
-          willChange: 'transform',
-        }}
-      />
+      <div className="hero-blackout-overlay" />
 
       {/* 2. THE EXPANDING FRAME (Sits exactly between 3D canvas and Text) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">

@@ -27,17 +27,16 @@ export default function HeroTransitionWrapper({ isEntered = true }) {
         }
       });
 
+      // Ensure initial position is completely below viewport
+      gsap.set('.hero-blackout-overlay', { yPercent: 100 });
+
       // We start the text centering immediately without waiting for the 3D model to finish zooming.
       tl.add('start')
         
         // --- PHASE 1: Center Text & Blackout from Bottom to Top simultaneously (Zero Lag) ---
         .add('centerText')
         .to('.hero-text-container', { y: '-39vh', duration: 1, ease: 'power2.inOut' }, 'centerText')
-        .fromTo('.hero-blackout-overlay', 
-          { yPercent: 100 }, 
-          { yPercent: 0, duration: 1, ease: 'power2.inOut' }, 
-          'centerText'
-        )
+        .to('.hero-blackout-overlay', { yPercent: 0, duration: 1, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-desc-wrapper', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
         .to('.hero-navbar', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
         .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
