@@ -288,39 +288,34 @@ export default function HeroSection({ isEntered = true, children }) {
           animation: none !important;
         }
 
-        /* Navbar reveal coordinated with loading (hidden during initial loader, fades in with text roll) */
+        /* Navbar visibility: hidden during initial loader, returns to normal once loaded */
         body:not(.loaded) .hero-navbar {
           opacity: 0 !important;
           pointer-events: none !important;
         }
 
-        body.loaded .hero-navbar {
-          opacity: 1 !important;
-          pointer-events: auto !important;
-          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
-        }
-
-        /* Blackout Curtain (Pure Solid #070103, Hardware-Accelerated 120fps Zero Lag) */
+        /* Blackout Curtain with Soft Atmospheric Gradient Fade (Hardware-Accelerated 120fps Zero Lag) */
         .hero-blackout-overlay {
           position: absolute;
-          inset: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
           width: 100%;
-          height: 100%;
-          background-color: #070103;
+          height: 180%;
+          background: linear-gradient(
+            to top,
+            #070103 0%,
+            #070103 45%,
+            rgba(7, 1, 3, 0.95) 58%,
+            rgba(7, 1, 3, 0.82) 70%,
+            rgba(7, 1, 3, 0.60) 80%,
+            rgba(7, 1, 3, 0.35) 90%,
+            rgba(7, 1, 3, 0.12) 96%,
+            transparent 100%
+          );
           z-index: 10;
           pointer-events: none;
           will-change: transform;
-        }
-
-        .hero-blackout-overlay::before {
-          content: '';
-          position: absolute;
-          bottom: 100%;
-          left: 0;
-          right: 0;
-          height: 120px;
-          background: linear-gradient(to top, #070103 0%, rgba(7, 1, 3, 0.8) 50%, transparent 100%);
-          pointer-events: none;
         }
 
         .vertical-text {

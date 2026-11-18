@@ -33,13 +33,14 @@ export default function HeroTransitionWrapper({ isEntered = true }) {
       // We start the text centering immediately without waiting for the 3D model to finish zooming.
       tl.add('start')
         
-        // --- PHASE 1: Center Text & Blackout from Bottom to Top simultaneously (Zero Lag) ---
+        // --- PHASE 1: Center Text & Soft Gradient Blackout simultaneously (Zero Lag) ---
         .add('centerText')
         .to('.hero-text-container', { y: '-39vh', duration: 1, ease: 'power2.inOut' }, 'centerText')
         .to('.hero-blackout-overlay', { yPercent: 0, duration: 1, ease: 'power2.inOut' }, 'centerText')
-        .to('.hero-desc-wrapper', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
-        .to('.hero-navbar', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
-        .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'centerText')
+        .to('.hero-model-canvas', { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 'centerText')
+        .to('.hero-desc-wrapper', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
+        .to('.hero-navbar', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
+        .to('.hero-text-shadow-bg', { opacity: 0, duration: 0.3, ease: 'power2.out' }, 'centerText')
         
         // --- PHASE 2: Split Text & Zoom In (Expanding Frame) ---
         .add('splitAndExpand', 'centerText+=1.4')
