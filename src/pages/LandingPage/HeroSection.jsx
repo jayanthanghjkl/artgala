@@ -331,7 +331,7 @@ export default function HeroSection({ isEntered = true, children }) {
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
         <div
           className="expanding-frame bg-[#f4f1ea] w-full h-full rounded-[200px] flex items-center justify-center overflow-hidden"
-          style={{ transform: 'scale(0)' }}
+          style={{ transform: 'scale(0)', opacity: 0 }}
         >
           {children}
         </div>

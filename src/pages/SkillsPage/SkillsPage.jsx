@@ -32,7 +32,7 @@ export default function SkillsPage() {
             y: 0,
             duration: 0.8,
             ease: 'power3.out',
-            clearProps: 'transform', // Clears transform style after entrance so sticky physics never stutter
+            clearProps: 'transform',
             scrollTrigger: {
               trigger: containerRef.current,
               start: 'top 80%',
@@ -59,7 +59,7 @@ export default function SkillsPage() {
         });
       },
       {
-        rootMargin: '-42% 0px -42% 0px', // Active inside the middle center slice of the screen
+        rootMargin: '-30% 0px -30% 0px', // Active inside the comfortable center slice of the screen
         threshold: 0,
       }
     );
@@ -97,7 +97,7 @@ export default function SkillsPage() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full bg-[#000000] text-white selection:bg-[#FF3300] selection:text-white font-sans antialiased"
+      className="relative w-full bg-[#000000] text-white selection:bg-[#FF3300] selection:text-white font-sans antialiased pt-20 sm:pt-28 md:pt-36 pb-36 md:pb-48"
     >
       <div className="w-full max-w-[1540px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 relative">
         <div
@@ -112,7 +112,7 @@ export default function SkillsPage() {
           {/* ========================================================= */}
           <div
             ref={leftColRef}
-            className="lg:col-span-6 lg:h-screen lg:sticky lg:top-0 flex flex-col justify-center z-10 max-w-xl xl:max-w-2xl pt-16 lg:pt-0 transform-gpu will-change-transform"
+            className="lg:col-span-6 lg:h-screen lg:sticky lg:top-0 flex flex-col justify-center z-10 max-w-xl xl:max-w-2xl pt-8 lg:pt-0 transform-gpu will-change-transform"
           >
             <div ref={contentWrapperRef}>
               {/* Bold Punchy Headline (Formatted cleanly in 5 lines) */}
@@ -138,10 +138,10 @@ export default function SkillsPage() {
           </div>
 
           {/* ========================================================= */}
-          {/* RIGHT COLUMN (6 cols on Desktop) - Streamlined width      */}
-          {/* Expands smoothly at center without layout thrash          */}
+          {/* RIGHT COLUMN (6 cols on Desktop) - Spacious Length        */}
+          {/* Expands smoothly at center with generous editorial flow   */}
           {/* ========================================================= */}
-          <div className="lg:col-span-6 max-w-lg lg:max-w-xl xl:max-w-2xl ml-auto w-full flex flex-col space-y-12 sm:space-y-16 md:space-y-20 relative pt-[30vh] pb-[16vh]">
+          <div className="lg:col-span-6 max-w-lg lg:max-w-xl xl:max-w-2xl ml-auto w-full flex flex-col space-y-16 sm:space-y-20 md:space-y-28 relative pt-8 sm:pt-12 lg:pt-16 pb-24">
             {skillsCategories.map((category, index) => {
               const isOpen = activeIndex === index;
               return (
@@ -149,7 +149,7 @@ export default function SkillsPage() {
                   key={category.id}
                   data-index={index}
                   ref={(el) => (itemRefs.current[index] = el)}
-                  className={`group border-b border-neutral-900/70 pb-8 sm:pb-10 transition-all duration-500 ease-out ${
+                  className={`group border-b border-neutral-900/70 py-6 sm:py-8 md:py-10 min-h-[140px] sm:min-h-[170px] md:min-h-[190px] flex flex-col justify-center transition-all duration-500 ease-out ${
                     isOpen ? 'opacity-100 scale-100' : 'opacity-40 hover:opacity-85 scale-[0.99]'
                   }`}
                 >

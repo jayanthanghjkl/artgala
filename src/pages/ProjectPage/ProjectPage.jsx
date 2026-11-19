@@ -79,14 +79,18 @@ export default function ProjectPage() {
 
       // DESKTOP (> 768px): Both Option Wheel + 3D Cards AND Floating Gallery are active
       mm.add("(min-width: 769px)", () => {
-        const p1End = 0.35;
-        const p2End = 0.40;
-        const galleryStart = 0.36;
+        // Allocate generous scroll budget to Act 1 so each card scrolls one by one deliberately without rolling out fast
+        // Act 1 (Dial/Cards): 0.00 -> 0.52 (~600vh)
+        // Act 2 (Cross-fade Exit): 0.52 -> 0.62 (~120vh)
+        // Act 3 (Floating Parallax Gallery + Slow Cinematic Exit): 0.58 -> 1.00 (~480vh)
+        const p1End = 0.52;
+        const p2End = 0.62;
+        const galleryStart = 0.58;
 
         ScrollTrigger.create({
           trigger: containerRef.current,
           start: 'top top',
-          end: `+=${galleryProjects.length * 85 + 220}vh`,
+          end: `+=${galleryProjects.length * 135 + 380}vh`,
           pin: true,
           scrub: 1.0, // Responsive, fluid catch-up curve
           anticipatePin: 1,
@@ -98,20 +102,36 @@ export default function ProjectPage() {
               const step = p1End / maxIndex;
               return Math.min(p1End, Math.max(0, Math.round(value / step) * step));
             },
-            directional: true,
-            duration: { min: 0.2, max: 0.5 },
-            delay: 0.05,
-            ease: "power1.inOut"
+            directional: false,
+            duration: { min: 0.35, max: 0.65 },
+            delay: 0.08,
+            ease: "power2.out"
           },
           onToggle: (self) => setIsPinned(self.isActive),
           onUpdate: (self) => {
             const p = self.progress;
             const maxIndex = galleryProjects.length - 1;
 
-            // ACT 1: Dial & 3D Cards (0% – 35%)
+            // ACT 1: Dial & 3D Cards (0% – 52%)
             if (p < p1End) {
               const normP = p / p1End;
-              const targetIndex = normP * maxIndex;
+              const rawIndex = normP * maxIndex;
+              const base = Math.floor(rawIndex);
+              const frac = rawIndex - base;
+
+              // Dwell zone: Card rests rock-solid for 35% of the scroll segment,
+              // then flips cleanly to the next card via smooth cubic curve
+              let targetIndex;
+              if (base >= maxIndex) {
+                targetIndex = maxIndex;
+              } else if (frac < 0.35) {
+                targetIndex = base;
+              } else {
+                const t = (frac - 0.35) / 0.65;
+                const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                targetIndex = base + eased;
+              }
+
               const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
 
               wheelIndexRef.current = targetIndex;
@@ -153,7 +173,7 @@ export default function ProjectPage() {
                 });
               }
 
-              // Gallery progression starts blending in at 0.35
+              // Gallery progression starts blending in at 0.58
               const galleryP = Math.min(1, Math.max(0, (p - galleryStart) / (1.00 - galleryStart)));
 
               if (Math.abs(galleryP - galleryProgressRef.current) > 0.001) {
@@ -161,12 +181,16 @@ export default function ProjectPage() {
                 setGalleryProgress(galleryP);
               }
 
+              // Slow, cinematic Floating Gallery fade & Parallax exit
+              // The 3D Camera Dolly moves the cards forward towards the camera from galleryP = 0.74 -> 0.98.
+              // Keep the showcase completely visible and unobstructed during the fly-through.
               if (galleryShowcaseRef.current) {
                 let galleryOpacity = 1;
                 if (galleryP < 0.08) {
                   galleryOpacity = galleryP / 0.08;
-                } else if (galleryP > 0.96) {
-                  galleryOpacity = Math.max(0, (1 - galleryP) / 0.04);
+                } else if (galleryP > 0.94) {
+                  // Gently dissolves at the very end of the fly-through (0.94 -> 0.99)
+                  galleryOpacity = Math.max(0, 1 - (galleryP - 0.94) / 0.05);
                 }
 
                 gsap.set(galleryShowcaseRef.current, {
@@ -174,13 +198,17 @@ export default function ProjectPage() {
                   y: 0,
                   scale: 1,
                   opacity: galleryOpacity,
-                  pointerEvents: galleryP >= 0.48 && galleryP < 0.76 ? 'auto' : 'none'
+                  pointerEvents: galleryP >= 0.15 && galleryP < 0.74 ? 'auto' : 'none'
                 });
               }
 
-              // Black fade-out transition as gallery concludes (0.78 -> 0.97)
+              // Black fade-out transition activates only AFTER cards fly past camera (0.91 -> 0.98)
+              // Followed by a pure black resting cushion from 0.98 -> 1.00 before unpinning into Skills
               if (blackFadeRef.current) {
-                const blackOpacity = Math.min(1, Math.max(0, (galleryP - 0.78) / 0.18));
+                let blackOpacity = 0;
+                if (galleryP > 0.91) {
+                  blackOpacity = Math.min(1, (galleryP - 0.91) / 0.07);
+                }
                 gsap.set(blackFadeRef.current, { opacity: blackOpacity });
               }
             }
@@ -196,7 +224,7 @@ export default function ProjectPage() {
         ScrollTrigger.create({
           trigger: containerRef.current,
           start: 'top top',
-          end: `+=${galleryProjects.length * 60 + 80}vh`,
+          end: `+=${galleryProjects.length * 80 + 100}vh`,
           pin: true,
           scrub: 0.8,
           anticipatePin: 1,
@@ -206,8 +234,8 @@ export default function ProjectPage() {
               const step = 0.85 / maxIndex;
               return Math.min(0.85, Math.max(0, Math.round(value / step) * step));
             },
-            duration: { min: 0.2, max: 0.4 },
-            ease: "power1.inOut"
+            duration: { min: 0.3, max: 0.5 },
+            ease: "power2.out"
           },
           onToggle: (self) => setIsPinned(self.isActive),
           onUpdate: (self) => {
@@ -218,10 +246,23 @@ export default function ProjectPage() {
               gsap.set(galleryShowcaseRef.current, { opacity: 0, pointerEvents: 'none' });
             }
 
-            // 0.00 -> 0.85: Scroll through Option Wheel
+            // 0.00 -> 0.85: Scroll through Option Wheel with dwell plateau
             if (p <= 0.85) {
               const normP = p / 0.85;
-              const targetIndex = normP * maxIndex;
+              const rawIndex = normP * maxIndex;
+              const base = Math.floor(rawIndex);
+              const frac = rawIndex - base;
+              let targetIndex;
+              if (base >= maxIndex) {
+                targetIndex = maxIndex;
+              } else if (frac < 0.35) {
+                targetIndex = base;
+              } else {
+                const t = (frac - 0.35) / 0.65;
+                const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                targetIndex = base + eased;
+              }
+
               const newActive = Math.min(maxIndex, Math.max(0, Math.round(targetIndex)));
 
               wheelIndexRef.current = targetIndex;
@@ -265,7 +306,10 @@ export default function ProjectPage() {
         animation: tl,
         scrub: true,
       });
-      tl.to('.hero-master-wrapper', { scale: 0.8, rotation: -5, transformOrigin: 'center center', ease: 'none' }, 0);
+      const heroMaster = document.querySelector('.hero-master-wrapper');
+      if (heroMaster) {
+        tl.to(heroMaster, { scale: 0.8, rotation: -5, transformOrigin: 'center center', ease: 'none' }, 0);
+      }
       tl.fromTo(innerRef.current,
         { scale: 0.8, rotation: 5, transformOrigin: 'top center', borderTopLeftRadius: '40px', borderTopRightRadius: '40px' },
         { scale: 1, rotation: 0, borderTopLeftRadius: '0px', borderTopRightRadius: '0px', ease: 'none' },

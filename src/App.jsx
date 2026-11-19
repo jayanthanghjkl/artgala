@@ -27,11 +27,7 @@ export default function App() {
   const [projectId, setProjectId] = useState(null);
 
   useEffect(() => {
-    // Intelligent wheel adapter: Differentiates physical mouse wheels from trackpads.
-    // Mouse wheels produce discrete, notched impulses requiring higher base delta and acceleration.
-    // Trackpads emit high-frequency float streams with OS momentum requiring velocity clamping.
     let lastWheelTime = 0;
-    let lastIsTrackpad = false;
     let wheelStreak = 0;
 
     let lenis;
@@ -39,12 +35,12 @@ export default function App() {
       duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      wheelMultiplier: 1.0, // Base 1:1 multiplier; normalized dynamically in virtualScroll
+      wheelMultiplier: 1.0,
       touchMultiplier: 1.2,
       syncTouch: false,
       virtualScroll: (data) => {
         const { event } = data;
-        if (!event || event.type !== 'wheel') return;
+        if (!event) return;
 
         const now = performance.now();
         const dt = now - lastWheelTime;
@@ -55,79 +51,114 @@ export default function App() {
         const absY = Math.abs(rawDeltaY);
         const absX = Math.abs(rawDeltaX);
 
-        // Hardware heuristics to identify input device:
-        // 1. Line mode (event.deltaMode !== 0, e.g. Firefox or Windows mouse wheel setting) is strictly a physical mouse.
-        // 2. High-precision trackpads emit fractional/floating-point deltas (e.g. 1.25, 14.8).
-        // 3. Discrete mouse detents in Windows/macOS emit integer step values (typically 100, 120, or 40).
-        // 4. Trackpad gestures emit high-frequency stream bursts (dt < 30ms) with small individual deltas.
-        const isLineMode = event.deltaMode !== 0;
-        const isFractional = (absY % 1 !== 0) || (absX % 1 !== 0);
-        const isStandardMouseStep = absY >= 80 && (absY % 100 === 0 || absY % 120 === 0 || absY % 40 === 0) && absX === 0;
+        if (absY < 1 && absX < 1) return;
 
-        let isMouse = false;
-        if (isLineMode) {
-          isMouse = true;
-          lastIsTrackpad = false;
-        } else if (isFractional) {
-          isMouse = false;
-          lastIsTrackpad = true;
-        } else if (isStandardMouseStep) {
-          isMouse = true;
-          lastIsTrackpad = false;
-        } else if (dt < 30 && lastIsTrackpad) {
-          isMouse = false;
-        } else if (absY >= 100 && absX === 0) {
-          isMouse = true;
-          lastIsTrackpad = false;
-        } else {
-          isMouse = false;
-          lastIsTrackpad = true;
+        // Detect if currently scrolling inside precision interactive sections (#projects or #skills)
+        let isPrecisionSection = false;
+        const projectsEl = document.getElementById('projects');
+        if (projectsEl) {
+          const rect = projectsEl.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.85 && rect.bottom >= -window.innerHeight * 0.1) {
+            isPrecisionSection = true;
+          }
+        }
+        if (!isPrecisionSection) {
+          const skillsEl = document.getElementById('skills');
+          if (skillsEl) {
+            const rect = skillsEl.getBoundingClientRect();
+            if (rect.top <= window.innerHeight * 0.85 && rect.bottom >= window.innerHeight * 0.1) {
+              isPrecisionSection = true;
+            }
+          }
         }
 
-        if (isMouse) {
-          // Physical mouse wheel optimization:
-          // Build natural momentum when rolling the mouse wheel rapidly
-          if (dt < 220) {
-            wheelStreak = Math.min(wheelStreak + 1, 6);
-          } else {
+        // Hardware heuristics to identify input device:
+        // 1. Line mode (event.deltaMode !== 0, e.g. Firefox or Windows mouse wheel setting) is strictly a physical mouse.
+        // 2. High-precision trackpads emit fractional deltas, horizontal drift, small deltas (<60), or high-frequency stream bursts (dt < 55ms).
+        // 3. Discrete mouse detents in Windows/macOS emit integer step values (typically 100 or 120) with zero horizontal drift and spaced intervals.
+        const isLineMode = event.deltaMode !== 0;
+        const isFractional = (absY % 1 !== 0) || (absX % 1 !== 0);
+        const hasHorizontal = absX > 0;
+        const isStandardMouseNotch = !isFractional && !hasHorizontal && (absY === 100 || absY === 120 || absY === 200 || absY === 240);
+
+        let isTrackpad = false;
+        if (isLineMode) {
+          // Line mode is strictly mouse wheel
+          isTrackpad = false;
+        } else if (isFractional || hasHorizontal || absY < 60) {
+          // Small deltas (<60), fractional values, or horizontal drift are strictly trackpads
+          isTrackpad = true;
+        } else if (dt > 0 && dt < 55) {
+          // Continuous high-frequency stream (<55ms interval) is strictly a trackpad gesture
+          isTrackpad = true;
+        } else if (isStandardMouseNotch && (dt === 0 || dt >= 55)) {
+          // Discrete mouse notch with proper inter-click spacing
+          isTrackpad = false;
+        } else {
+          // Conservative default for Windows precision touchpads: treat continuous/variable events as trackpad
+          isTrackpad = true;
+        }
+
+        if (!isTrackpad) {
+          // Physical mouse wheel - Preserved exactly as tuned
+          if (isPrecisionSection) {
+            // REDUCE SCROLL SPEED IN PROJECTS & SKILLS:
+            // Zero runaway acceleration and gentle notch delta (~90px) so items scroll deliberately one by one!
             wheelStreak = 0;
-          }
+            const sign = Math.sign(rawDeltaY) || 1;
+            const notchDistance = 90;
+            data.deltaY = sign * notchDistance;
 
-          // Dynamic acceleration curve (1.0x at rest up to 2.5x during fast rolling)
-          const accel = 1.0 + (wheelStreak * 0.25);
-
-          // Calculate comfortable travel distance per notch (~180px - 220px base vs previous 60px)
-          let baseDelta;
-          if (isLineMode) {
-            // Firefox/Windows line mode: Lenis produces ~50px default, boost to ~190px base
-            baseDelta = Math.sign(rawDeltaY) * Math.max(Math.abs(data.deltaY) * 3.8, 190);
+            if (lenis) {
+              lenis.options.duration = 0.95;
+            }
           } else {
-            // Standard pixel mode (100px or 120px notch) -> boost to ~190-220px base
-            baseDelta = Math.sign(rawDeltaY) * Math.max(Math.abs(data.deltaY) * 1.9, 190);
-          }
+            // Normal browsing sections (Hero, About, Achievements, Footer, etc.)
+            if (dt < 250) {
+              wheelStreak = Math.min(wheelStreak + 1, 5);
+            } else {
+              wheelStreak = 0;
+            }
 
-          data.deltaY = baseDelta * accel;
+            const accel = 1.0 + (wheelStreak * 0.12);
+            const sign = Math.sign(rawDeltaY) || 1;
+            const notchDistance = Math.max(Math.abs(data.deltaY) * 1.35, 140);
 
-          // Snappier response curve for crisp mouse feedback
-          if (lenis) {
-            lenis.options.duration = Math.max(0.75, 0.95 - (wheelStreak * 0.04));
+            data.deltaY = sign * notchDistance * accel;
+
+            if (lenis) {
+              lenis.options.duration = 1.05;
+            }
           }
         } else {
-          // Trackpad gesture optimization:
+          // Trackpad gesture:
+          // Substantially dampen delta magnitude and clamp momentum flicks so the page
+          // scrolls smoothly with luxurious control and does not fly fast
           wheelStreak = 0;
+          const sign = Math.sign(data.deltaY) || 1;
 
-          // Soften trackpad flicks so rapid momentum does not violently skip sections
-          const sign = Math.sign(data.deltaY);
-          const clampedY = sign * Math.min(Math.abs(data.deltaY), 85);
-          data.deltaY = clampedY * 0.85;
-
-          // Smooth, luxurious glide for trackpad gestures
-          if (lenis) {
-            lenis.options.duration = 1.15;
+          if (isPrecisionSection) {
+            // Precision sections (#projects, #skills):
+            // Deliberate, gentle stepping so cards and skills step one by one
+            const clamped = Math.min(Math.abs(data.deltaY), 12);
+            data.deltaY = sign * clamped * 0.22;
+            if (lenis) {
+              lenis.options.duration = 0.65;
+            }
+          } else {
+            // Normal browsing sections (Hero, About, Achievements, Footer, etc.):
+            // Tame fast trackpad scrolls so navigation feels calm, stable, and cinematic
+            const clamped = Math.min(Math.abs(data.deltaY), 16);
+            data.deltaY = sign * clamped * 0.26;
+            if (lenis) {
+              lenis.options.duration = 0.70;
+            }
           }
         }
       },
     });
+
+    window.__lenis = lenis;
 
     // Keep ScrollTrigger and Lenis in lockstep
     lenis.on('scroll', ScrollTrigger.update);
@@ -157,7 +188,7 @@ export default function App() {
       setProjectId(null);
       document.body.style.overflow = '';
     }
-    
+
     return () => { document.body.style.overflow = ''; }
   }, [location.hash]);
 

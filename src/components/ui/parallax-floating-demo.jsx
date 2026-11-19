@@ -29,14 +29,14 @@ function getCardStyle(progress, index) {
 
   // Fade out cards at the very end of the POV pass as they fly past camera
   let cardOpacity = 1;
-  if (progress >= 0.76) {
-    const pDolly = (progress - 0.76) / 0.24;
-    if (pDolly > 0.65) {
-      cardOpacity = Math.max(0, 1 - (pDolly - 0.65) / 0.35);
+  if (progress >= 0.74) {
+    const pDolly = (progress - 0.74) / 0.24;
+    if (pDolly > 0.72) {
+      cardOpacity = Math.max(0, 1 - (pDolly - 0.72) / 0.26);
     }
   }
 
-  const isInteractive = progress >= 0.48 && progress < 0.76;
+  const isInteractive = progress >= 0.48 && progress < 0.74;
 
   return {
     transform: `translate3d(0, ${yPercent.toFixed(1)}%, 0) rotate(${rotate.toFixed(2)}deg)`,
@@ -48,9 +48,9 @@ function getCardStyle(progress, index) {
 }
 
 function getTextStyle(progress) {
-  // Phase 2: Fade in after cards settle (0.48 -> 0.60)
-  // Phase 3: Hold / Read Buffer (0.60 -> 0.72)
-  // Phase 4: Fade out upwards before POV fly-through (0.72 -> 0.76)
+  // Phase 2: Fade in after cards settle (0.48 -> 0.58)
+  // Phase 3: Hold / Read Buffer (0.58 -> 0.70)
+  // Phase 4: Fade out upwards before POV fly-through (0.70 -> 0.74)
   let opacity = 0;
   let y = 30;
   let scale = 0.96;
@@ -60,17 +60,17 @@ function getTextStyle(progress) {
     opacity = 0;
     y = 30;
     scale = 0.96;
-  } else if (progress >= 0.48 && progress < 0.60) {
-    const t = (progress - 0.48) / 0.12;
+  } else if (progress >= 0.48 && progress < 0.58) {
+    const t = (progress - 0.48) / 0.10;
     opacity = t;
     y = (1 - t) * 30;
     scale = 0.96 + t * 0.04;
-  } else if (progress >= 0.60 && progress < 0.72) {
+  } else if (progress >= 0.58 && progress < 0.70) {
     opacity = 1;
     y = 0;
     scale = 1;
-  } else if (progress >= 0.72 && progress < 0.76) {
-    const t = (progress - 0.72) / 0.04;
+  } else if (progress >= 0.70 && progress < 0.74) {
+    const t = (progress - 0.70) / 0.04;
     opacity = Math.max(0, 1 - t);
     y = -t * 35;
     scale = 1 - t * 0.04;
@@ -91,22 +91,22 @@ export const ParallaxFloatingDemo = ({ progress = 0, isActive = true }) => {
   const effectiveProgress = typeof progress === "number" ? progress : (isActive ? 1 : 0)
   const textStyle = getTextStyle(effectiveProgress)
 
-  // Phase 5: Camera Dolly forward continuously until the very end of scroll (0.76 -> 1.00)
-  const isDollyPhase = effectiveProgress >= 0.76
-  const dollyProgress = Math.min(1, Math.max(0, (effectiveProgress - 0.76) / 0.24))
+  // Phase 5: Camera Dolly forward continuously as cards fly towards and past camera (0.74 -> 0.98)
+  const isDollyPhase = effectiveProgress >= 0.74
+  const dollyProgress = Math.min(1, Math.max(0, (effectiveProgress - 0.74) / 0.24))
   const easedDolly = Math.pow(dollyProgress, 2.2) // Accelerates past camera seamlessly
 
   // The entire 3D world pushes forward along the Z axis right through the camera lens (up to 3200px)
   const worldZ = isDollyPhase ? easedDolly * 3200 : 0
   const worldPitch = isDollyPhase ? easedDolly * -5 : 0 // Subtle cinematic pitch
 
-  // Stage dissolves smoothly right into the Skills section
-  const stageOpacity = isDollyPhase && dollyProgress > 0.70
-    ? Math.max(0, 1 - (dollyProgress - 0.70) / 0.30)
+  // Stage dissolves smoothly right as cards finish flying past camera
+  const stageOpacity = isDollyPhase && dollyProgress > 0.78
+    ? Math.max(0, 1 - (dollyProgress - 0.78) / 0.20)
     : 1
 
   // Enable mouse tracking only during the settled hold window
-  const isFloatingActive = effectiveProgress >= 0.48 && effectiveProgress < 0.76
+  const isFloatingActive = effectiveProgress >= 0.48 && effectiveProgress < 0.74
 
   return (
     <div

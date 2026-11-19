@@ -23,8 +23,8 @@ export default function Home() {
       {/* Unified Project & Gallery Showcase with single persistent static background */}
       <ProjectPage />
 
-      {/* Cinematic Black Fade Transition Buffer into Skills - compact 2-scroll pace */}
-      <div className="w-full h-[6vh] md:h-[10vh] bg-black relative z-20 pointer-events-none" aria-hidden="true" />
+      {/* Cinematic Black Fade Transition Buffer into Skills */}
+      <div className="w-full h-[16vh] md:h-[24vh] bg-black relative z-20 pointer-events-none" aria-hidden="true" />
 
       {/* ========================================================================= */}
       {/* 1. SKILLS SECTION                                                         */}
