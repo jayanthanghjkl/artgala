@@ -20,7 +20,7 @@ export default function HeroTransitionWrapper({ isEntered = true }) {
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '+=800%', // Increased scroll distance to accommodate new phase
+          end: '+=650%', // Optimized scroll distance to keep transitions fluid and responsive
           scrub: 1, // Smooth scrubbing
           pin: true,
           anticipatePin: 1,

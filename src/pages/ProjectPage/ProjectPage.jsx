@@ -86,7 +86,7 @@ export default function ProjectPage() {
         ScrollTrigger.create({
           trigger: containerRef.current,
           start: 'top top',
-          end: `+=${galleryProjects.length * 120 + 350}vh`,
+          end: `+=${galleryProjects.length * 85 + 220}vh`,
           pin: true,
           scrub: 1.0, // Responsive, fluid catch-up curve
           anticipatePin: 1,
