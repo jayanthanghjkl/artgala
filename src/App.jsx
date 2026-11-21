@@ -17,6 +17,16 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ============================================================================
+// ⚙️ GLOBAL SCROLL SPEED CONTROLLER
+// Adjust this variable to control the scroll speed throughout the application!
+// • Higher value (e.g., 1.5, 2.0, 2.5) = Faster scrolling, fewer scrolls needed.
+// • Lower value (e.g., 0.6, 0.8) = Slower, more gradual scrolling.
+// Can also be dynamically adjusted and tested in the browser console via:
+//   window.__SCROLL_SPEED = 1.5;
+// ============================================================================
+export const SCROLL_SPEED = 3;
+
 /**
  * Main application component.
  * Coordinates smooth scrolling (Lenis), global navigation menus, cinematic backgrounds,
@@ -99,6 +109,10 @@ export default function App() {
           isTrackpad = true;
         }
 
+        const activeScrollSpeed = typeof window !== 'undefined' && typeof window.__SCROLL_SPEED === 'number'
+          ? window.__SCROLL_SPEED
+          : SCROLL_SPEED;
+
         if (!isTrackpad) {
           // Physical mouse wheel - Preserved exactly as tuned
           if (isPrecisionSection) {
@@ -106,7 +120,7 @@ export default function App() {
             // Zero runaway acceleration and gentle notch delta (~90px) so items scroll deliberately one by one!
             wheelStreak = 0;
             const sign = Math.sign(rawDeltaY) || 1;
-            const notchDistance = 90;
+            const notchDistance = 90 * activeScrollSpeed;
             data.deltaY = sign * notchDistance;
 
             if (lenis) {
@@ -122,7 +136,8 @@ export default function App() {
 
             const accel = 1.0 + (wheelStreak * 0.12);
             const sign = Math.sign(rawDeltaY) || 1;
-            const notchDistance = Math.max(Math.abs(data.deltaY) * 1.35, 140);
+            const baseDistance = Math.max(Math.abs(data.deltaY) * 1.35, 140);
+            const notchDistance = baseDistance * activeScrollSpeed;
 
             data.deltaY = sign * notchDistance * accel;
 
@@ -140,16 +155,16 @@ export default function App() {
           if (isPrecisionSection) {
             // Precision sections (#projects, #skills):
             // Deliberate, gentle stepping so cards and skills step one by one
-            const clamped = Math.min(Math.abs(data.deltaY), 12);
-            data.deltaY = sign * clamped * 0.22;
+            const clamped = Math.min(Math.abs(data.deltaY), 12 * activeScrollSpeed);
+            data.deltaY = sign * clamped * (0.22 * activeScrollSpeed);
             if (lenis) {
               lenis.options.duration = 0.65;
             }
           } else {
             // Normal browsing sections (Hero, About, Achievements, Footer, etc.):
             // Tame fast trackpad scrolls so navigation feels calm, stable, and cinematic
-            const clamped = Math.min(Math.abs(data.deltaY), 16);
-            data.deltaY = sign * clamped * 0.26;
+            const clamped = Math.min(Math.abs(data.deltaY), 16 * activeScrollSpeed);
+            data.deltaY = sign * clamped * (0.26 * activeScrollSpeed);
             if (lenis) {
               lenis.options.duration = 0.70;
             }
